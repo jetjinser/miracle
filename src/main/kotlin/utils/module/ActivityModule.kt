@@ -14,7 +14,7 @@ data class ActivityModule(
     val participants: Int,
 
     @SerialName("price")
-    val price: Int,
+    val price: Float,
 
     @SerialName("link")
     val link: String,

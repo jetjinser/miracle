@@ -5,15 +5,10 @@ import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.content
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Request
-import okhttp3.Response
-import utils.logger.BotLogger
 import utils.module.ActivityModule
-import utils.network.OkHttpUtil
-import java.io.IOException
+import java.net.URL
 
+@OptIn(UnstableDefault::class)
 fun Bot.random() {
     subscribeGroupMessages {
         startsWith("随机数") {
@@ -40,7 +35,10 @@ fun Bot.random() {
         }
 
         Regex("找点乐子|没事找事|找点事做") matchingReply {
-            getActivity()
+            Json.parse(ActivityModule.serializer(), URL("http://www.boredapi.com/api/activity/").readText()).let {
+                "你可以\n\t${it.activity}\n可行性:\t${it.accessibility}\n" +
+                        "类型:\t${it.type}\n参与人数:\t${it.participants}\n花费:\t${it.price}\n${it.link}"
+            }
         }
     }
 }
@@ -66,35 +64,4 @@ fun randomNumber(message: String): String {
     }
 
     return (start..end).random().toString()
-}
-
-
-@OptIn(UnstableDefault::class)
-fun getActivity(): String {
-    val url = "http://www.boredapi.com/api/activity/"
-
-    lateinit var msg: String
-
-    val okHttpClient = OkHttpUtil.getInstance()
-    okHttpClient?.newCall(
-        Request.Builder()
-            .url(url)
-            .get().build()
-    )?.apply {
-        enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                BotLogger.logger("okhttp").warning("failed: $url cause of ${e.message}")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string()?.let {
-                    val data = Json.parse(ActivityModule.serializer(), it)
-                    msg =
-                        "你可以\n\t${data.activity}\n可行性:\t${data.accessibility}\n" +
-                                "类型:\t${data.type}\n参与人数:\t${data.participants}\n花费:\t${data.price}\n${data.link}"
-                }
-            }
-        })
-    }
-    return msg
 }
