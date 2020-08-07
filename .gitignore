@@ -1,0 +1,7 @@
+# Project exclude paths
+/.gradle/
+/build/
+/.idea/
+/src/test/
+/device.json
+/src/main/kotlin/Config.kt
