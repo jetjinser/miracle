@@ -11,6 +11,9 @@ fun Bot.builtInReply() {
         Regex("你好|泥嚎") matchingReply { listOf("泥嚎,我很阔爱,请给我钱", "").random() }
 
         "草" reply listOf("草", "草", "草", "草", "").random()
-        "机屑人" reply listOf("你才是机屑人", "").random()
+
+        contains("机屑人") {
+            listOf("你才是机屑人", "").random()
+        }
     }
 }
