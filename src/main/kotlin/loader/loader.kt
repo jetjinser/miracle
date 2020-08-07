@@ -3,6 +3,7 @@ package loader
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.join
+import plugins.builtInReply
 
 
 suspend fun main() {
@@ -12,6 +13,8 @@ suspend fun main() {
     ) {
         fileBasedDeviceInfo("device.json")
     }.alsoLogin()
+
+    bot.builtInReply()
 
     bot.join()
 }
