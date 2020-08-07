@@ -12,8 +12,12 @@ fun Bot.builtInReply() {
 
         "草" reply listOf("草", "草", "草", "草", "").random()
 
-        contains("机屑人") {
-            listOf("你才是机屑人", "").random()
+        "机屑人" containsReply {
+            listOf("你才是机屑人", "").random().let {
+                if (it != "") {
+                    reply(it)
+                }
+            }
         }
     }
 }
