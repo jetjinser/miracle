@@ -3,7 +3,7 @@ package utils.module
 import kotlinx.serialization.*
 
 @Serializable
-data class ActivityModule(
+data class ActivityModel(
     @SerialName("activity")
     val activity: String,
 
