@@ -4,6 +4,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.join
 import plugins.builtInReply
+import plugins.checkIn
 import plugins.random
 
 
@@ -17,6 +18,7 @@ suspend fun main() {
 
     bot.builtInReply()
     bot.random()
+    bot.checkIn()
 
     bot.join()
 }
