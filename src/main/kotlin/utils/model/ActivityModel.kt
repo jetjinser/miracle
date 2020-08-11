@@ -1,4 +1,4 @@
-package utils.module
+package utils.model
 
 import kotlinx.serialization.*
 

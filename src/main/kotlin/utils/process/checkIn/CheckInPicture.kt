@@ -1,6 +1,5 @@
-package utils.process
+package utils.process.checkIn
 
-import sun.misc.BASE64Encoder
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.RenderingHints
@@ -10,9 +9,42 @@ import java.awt.image.BufferedImage
 import java.net.URL
 import javax.imageio.ImageIO
 
+/**
+ * 生成签到图片
+ */
 object CheckInPicture {
-    fun produce(url: String): BufferedImage {
-        val avatarImage = scaleByPercentage(ImageIO.read(URL(url)))
+    fun generate(url: String): BufferedImage {
+        val image = ImageIO.read(URL(url))
+        return smallAvatar(image)
+    }
+
+    private fun scaleByPercentage(inputImage: BufferedImage): BufferedImage {
+        val newWidth = 120
+        val newHeight = 120
+
+        // 获取原始图像透明度类型
+        val type = inputImage.colorModel.transparency
+        val width = inputImage.width
+        val height = inputImage.height
+
+        // 开启抗锯齿
+        val renderingHints =
+            RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        // 使用高质量压缩
+        renderingHints[RenderingHints.KEY_RENDERING] = RenderingHints.VALUE_RENDER_QUALITY
+
+        val img = BufferedImage(newWidth, newHeight, type)
+        val graphics2d = img.createGraphics()
+        graphics2d.setRenderingHints(renderingHints)
+
+        graphics2d.drawImage(inputImage, 0, 0, newWidth, newHeight, 0, 0, width, height, null)
+        graphics2d.dispose()
+
+        return img
+    }
+
+    private fun smallAvatar(image: BufferedImage): BufferedImage {
+        val avatarImage = scaleByPercentage(image)
 
         val width = avatarImage.width
 
@@ -50,28 +82,13 @@ object CheckInPicture {
         return formatAvatarImage
     }
 
-    private fun scaleByPercentage(inputImage: BufferedImage): BufferedImage {
-        val newWidth = 120
-        val newHeight = 120
-
-        // 获取原始图像透明度类型
-        val type = inputImage.colorModel.transparency
-        val width = inputImage.width
-        val height = inputImage.height
-
-        // 开启抗锯齿
-        val renderingHints =
-            RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-        // 使用高质量压缩
-        renderingHints[RenderingHints.KEY_RENDERING] = RenderingHints.VALUE_RENDER_QUALITY
-
-        val img = BufferedImage(newWidth, newHeight, type)
-        val graphics2d = img.createGraphics()
-        graphics2d.setRenderingHints(renderingHints)
-
-        graphics2d.drawImage(inputImage, 0, 0, newWidth, newHeight, 0, 0, width, height, null)
-        graphics2d.dispose()
-
-        return img
+    private fun backgroundAvatar(image: BufferedImage): BufferedImage {
+        return GaussianBlurUtil.blur(image, 15)
     }
+
+    private fun tablet() {}
+
+    private fun write() {}
+
+    private fun compound() {}
 }

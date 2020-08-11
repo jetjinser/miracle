@@ -5,7 +5,7 @@ import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.content
-import utils.module.ActivityModel
+import utils.model.ActivityModel
 import java.net.URL
 
 @OptIn(UnstableDefault::class)
