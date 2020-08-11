@@ -86,7 +86,14 @@ object CheckInPicture {
         return GaussianBlurUtil.blur(image, 15)
     }
 
-    private fun tablet() {}
+    private fun tablet(): BufferedImage {
+        return BufferedImage(540, 160, BufferedImage.TYPE_INT_ARGB).also {
+            it.createGraphics().apply {
+                color = Color(0, 0, 0, 90)
+                fillRect(0, 0, 540, 160)
+            }
+        }
+    }
 
     private fun write() {}
 
