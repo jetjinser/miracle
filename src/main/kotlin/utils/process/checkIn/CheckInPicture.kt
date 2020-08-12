@@ -9,6 +9,7 @@ import javax.imageio.ImageIO
 
 /**
  * 生成签到图片
+ * @author jinser
  */
 object CheckInPicture {
     fun generate(url: String): BufferedImage {
@@ -113,16 +114,24 @@ object CheckInPicture {
                 "锦瑟",
                 "签 到 成 功",
                 "Cuprum 1919810",
-                "签到天数  114       好感度  514"
+                "签到天数  114       好感度  514",
+                "money～money～money～～money～money"
             )
 
             var temp = textHeight
-            for (text in textArray) {
+            for (text in textArray.dropLast(1)) {
                 var textWidth = 0
                 text.forEach { textWidth += FontDesignMetrics.getMetrics(cFont).charWidth(it) }
                 drawString(text, (width - textWidth) / 2, temp)
                 temp += textHeight
             }
+
+            val tip = textArray.last()
+            var tipWidth = 0
+            val tipsFont = Font("Microsoft JhengHei", Font.BOLD, 20)
+            font = tipsFont
+            tip.forEach { tipWidth += FontDesignMetrics.getMetrics(tipsFont).charWidth(it) }
+            drawString(tip, (width - tipWidth) / 2, temp + 6)
         }
         return tablet
     }

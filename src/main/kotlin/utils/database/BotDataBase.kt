@@ -27,5 +27,13 @@ object BotDataBase {
         val checkInDays = int("check_in_days")
         val lastCheckInDay = varchar("last_check_in_day")
         val cuprum = int("cuprum")
+        val favor = int("favor")
+    }
+
+    object Tip : Table<Nothing>("Tip") {
+        val id = int("id").primaryKey()
+        val tip = varchar("tip")
+        val date = varchar("date")
+        val qqId = varchar("qq_id")
     }
 }

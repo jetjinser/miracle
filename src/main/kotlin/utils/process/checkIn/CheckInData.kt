@@ -14,6 +14,7 @@ import java.util.*
  * 处理签到的数据
  * @param event 机器人收到的群消息的事件
  * @see GroupMessageEvent
+ * @author jinser
  */
 class CheckInData(private val event: GroupMessageEvent) {
     private var query: Query?
@@ -28,6 +29,9 @@ class CheckInData(private val event: GroupMessageEvent) {
         }
     }
 
+    /**
+     * 注册 / 初始化 User 到数据库
+     */
     private fun registeredUser() {
         dataBase?.insert(User) {
             it.QQId to event.sender.id
@@ -38,6 +42,9 @@ class CheckInData(private val event: GroupMessageEvent) {
         }
     }
 
+    /**
+     * 从数据里取值的抽象方法
+     */
     private fun <T : Any> getValue(column: Column<T>): Any? {
         query?.forEach {
             val value = it[column]
@@ -50,6 +57,9 @@ class CheckInData(private val event: GroupMessageEvent) {
         return null
     }
 
+    /**
+     * 设置 / update 数据库值的抽象方法
+     */
     private fun <T> setValue(value: T, key: String) {
         if (value != null) {
             dataBase?.update(User) {
@@ -83,4 +93,8 @@ class CheckInData(private val event: GroupMessageEvent) {
     var cuprum: Int?
         get() = getValue(User.cuprum) as Int?
         set(value) = setValue(value, "cuprum")
+
+    var favor: Int?
+        get() = getValue(User.favor) as Int?
+        set(value) = setValue(value, "favor")
 }
