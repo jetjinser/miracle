@@ -7,8 +7,7 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import utils.database.BotDataBase
 import utils.database.BotDataBase.User
 import utils.logger.BotLogger
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDate
 
 /**
  * 处理签到的数据
@@ -38,7 +37,7 @@ class CheckInData(private val event: GroupMessageEvent) {
             it.nickname to event.sender.nick
             it.card to event.sender.nameCard
             it.checkInDays to 0
-            it.lastCheckInDay to SimpleDateFormat("YYYY-MM-d").format(Date())
+            it.lastCheckInDay to LocalDate.now().toString()
         }
     }
 
@@ -74,27 +73,27 @@ class CheckInData(private val event: GroupMessageEvent) {
     }
 
 
-    var nickname: String?
-        get() = getValue(User.nickname) as String?
-        set(value) = setValue(value, "nickname")
+//    var nickname: String
+//        get() = getValue(User.nickname) as String
+//        set(value) = setValue(value, "nickname")
 
-    var card: String?
-        get() = getValue(User.card) as String?
+    var card: String
+        get() = getValue(User.card) as String
         set(value) = setValue(value, "card")
 
-    var checkInDays: Int?
-        get() = getValue(User.checkInDays) as Int?
+    var checkInDays: Int
+        get() = getValue(User.checkInDays) as Int
         set(value) = setValue(value, "checkInDays")
 
-    var lastCheckInDay: String?
-        get() = getValue(User.lastCheckInDay) as String?
+    var lastCheckInDay: String
+        get() = getValue(User.lastCheckInDay) as String
         set(value) = setValue(value, "lastCheckInDay")
 
-    var cuprum: Int?
-        get() = getValue(User.cuprum) as Int?
+    var cuprum: Int
+        get() = getValue(User.cuprum) as Int
         set(value) = setValue(value, "cuprum")
 
-    var favor: Int?
-        get() = getValue(User.favor) as Int?
+    var favor: Int
+        get() = getValue(User.favor) as Int
         set(value) = setValue(value, "favor")
 }

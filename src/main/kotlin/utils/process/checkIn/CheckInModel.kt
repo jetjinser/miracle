@@ -1,11 +1,17 @@
 package utils.process.checkIn
 
+import net.mamoe.mirai.message.GroupMessageEvent
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 /**
  * 封装数据处理类, 便于签到处理
- * @param checkInData 签到的数据处理类
+ * @param event bot 收到的群消息的事件, 用于构造 [checkInData]
  * @author jinser
  */
-class CheckInModel(private val checkInData: CheckInData) {
+class CheckInModel(event: GroupMessageEvent) {
+    private val checkInData: CheckInData = CheckInData(event)
+
     fun getCheckInfoArray() = arrayOf(
         checkInData.card,
         "签 到 成 功",
@@ -13,6 +19,24 @@ class CheckInModel(private val checkInData: CheckInData) {
         "签到天数 ${checkInData.checkInDays}       好感度 ${checkInData.favor}",
         "tips" // TODO tips 540 px 宽
     )
+
+    /**
+     * 签到函数
+     * @return 是否成功
+     */
+    fun checkIn(): Boolean {
+        checkInData.apply {
+            val now = LocalDate.now()
+            return if (LocalDate.parse(lastCheckInDay, DateTimeFormatter.ISO_DATE) < now) {
+                favor = favorAlgorithm(checkInDays, favor)
+                cuprum = cuprumAlgorithm(favor, cuprum)
+                lastCheckInDay = now.toString()
+                true
+            } else {
+                false
+            }
+        }
+    }
 
     /**
      * @param checkInDays 签到天数

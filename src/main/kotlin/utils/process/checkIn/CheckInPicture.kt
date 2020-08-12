@@ -11,8 +11,8 @@ import javax.imageio.ImageIO
  * 生成签到图片
  * @author jinser
  */
-object CheckInPicture {
-    fun generate(url: String): BufferedImage {
+class CheckInPicture(private val url: String, private val checkInModel: CheckInModel) {
+    fun generate(): BufferedImage {
         val image = ImageIO.read(URL(url))
         return compound(image)
     }
@@ -110,13 +110,7 @@ object CheckInPicture {
 
 
             val textHeight = FontDesignMetrics.getMetrics(cFont).height - 5
-            val textArray = arrayOf(
-                "锦瑟",
-                "签 到 成 功",
-                "Cuprum 1919810",
-                "签到天数  114       好感度  514",
-                "money～money～money～～money～money"
-            )
+            val textArray = checkInModel.getCheckInfoArray()
 
             var temp = textHeight
             for (text in textArray.dropLast(1)) {
