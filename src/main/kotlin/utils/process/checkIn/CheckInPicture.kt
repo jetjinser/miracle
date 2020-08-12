@@ -114,18 +114,22 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
 
             var temp = textHeight
             for (text in textArray.dropLast(1)) {
-                var textWidth = 0
-                text.forEach { textWidth += FontDesignMetrics.getMetrics(cFont).charWidth(it) }
-                drawString(text, (width - textWidth) / 2, temp)
-                temp += textHeight
+                if (text != null) {
+                    var textWidth = 0
+                    text.forEach { textWidth += FontDesignMetrics.getMetrics(cFont).charWidth(it) }
+                    drawString(text, (width - textWidth) / 2, temp)
+                    temp += textHeight
+                }
             }
 
             val tip = textArray.last()
             var tipWidth = 0
             val tipsFont = Font("Microsoft JhengHei", Font.BOLD, 20)
             font = tipsFont
-            tip.forEach { tipWidth += FontDesignMetrics.getMetrics(tipsFont).charWidth(it) }
-            drawString(tip, (width - tipWidth) / 2, temp + 6)
+            if (tip != null) {
+                tip.forEach { tipWidth += FontDesignMetrics.getMetrics(tipsFont).charWidth(it) }
+                drawString(tip, (width - tipWidth) / 2, temp + 6)
+            }
         }
         return tablet
     }

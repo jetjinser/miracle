@@ -3,6 +3,7 @@ package utils.database
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.schema.Table
 import me.liuwj.ktorm.schema.int
+import me.liuwj.ktorm.schema.long
 import me.liuwj.ktorm.schema.varchar
 import utils.network.OkHttpUtil
 
@@ -13,7 +14,7 @@ object BotDataBase {
         if (singleton == null) {
             synchronized(OkHttpUtil::class.java) {
                 if (singleton == null) {
-                    singleton = Database.connect("jdbc:sqlite:/src/main/resource/data.db")
+                    singleton = Database.connect("jdbc:sqlite:C:/Users/cmdrj/Desktop/archived/miracle/src/main/resources/data.db")
                 }
             }
         }
@@ -21,7 +22,7 @@ object BotDataBase {
     }
 
     object User : Table<Nothing>("User") {
-        val QQId = int("qq_id").primaryKey()
+        val QQId = long("qq_id").primaryKey()
         val nickname = varchar("nickname")
         val card = varchar("card")
         val checkInDays = int("check_in_days")
@@ -34,6 +35,6 @@ object BotDataBase {
         val id = int("id").primaryKey()
         val tip = varchar("tip")
         val date = varchar("date")
-        val qqId = varchar("qq_id")
+        val qqId = long("qq_id")
     }
 }

@@ -28,8 +28,8 @@ class CheckInModel(event: GroupMessageEvent) {
         checkInData.apply {
             val now = LocalDate.now()
             return if (LocalDate.parse(lastCheckInDay, DateTimeFormatter.ISO_DATE) < now) {
-                favor = favorAlgorithm(checkInDays, favor)
-                cuprum = cuprumAlgorithm(favor, cuprum)
+                favor = favorAlgorithm(checkInDays!!, favor!!)
+                cuprum = cuprumAlgorithm(favor!!, cuprum!!)
                 lastCheckInDay = now.toString()
                 true
             } else {

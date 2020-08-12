@@ -9,10 +9,13 @@ import utils.process.checkIn.CheckInPicture
 fun Bot.checkIn() {
     subscribeGroupMessages {
         case("签到") {
-            val checkInModel = CheckInModel(this).also {
-                it.checkIn()
+            CheckInModel(this).also {
+                if (it.checkIn()) {
+                    CheckInPicture(sender.avatarUrl, it).generate().send()
+                } else {
+                    reply("您今天已经签到过了")
+                }
             }
-            CheckInPicture(sender.avatarUrl, checkInModel).generate().send()
         }
     }
 }
