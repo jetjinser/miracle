@@ -7,6 +7,8 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import utils.database.BotDataBase
 import utils.database.BotDataBase.User
 import utils.logger.BotLogger
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * 处理签到的数据
@@ -21,7 +23,8 @@ class CheckInData(private val event: GroupMessageEvent) {
     init {
         query = dataBase?.from(User)?.select()?.where { User.QQId.toLong() eq event.sender.id }
         if (query?.totalRecords == 0) {
-            // TODO
+            registeredUser()
+            query = dataBase?.from(User)?.select()?.where { User.QQId.toLong() eq event.sender.id }
         }
     }
 
@@ -30,8 +33,8 @@ class CheckInData(private val event: GroupMessageEvent) {
             it.QQId to event.sender.id
             it.nickname to event.sender.nick
             it.card to event.sender.nameCard
-            it.checkInDays to 0 // TODO 改成 Int
-            it.lastCheckInDay to "2020"
+            it.checkInDays to 0
+            it.lastCheckInDay to SimpleDateFormat("YYYY-MM-d").format(Date())
         }
     }
 
