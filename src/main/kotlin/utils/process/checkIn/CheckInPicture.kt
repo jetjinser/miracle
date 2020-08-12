@@ -1,9 +1,7 @@
 package utils.process.checkIn
 
-import java.awt.BasicStroke
-import java.awt.Color
-import java.awt.RenderingHints
-import java.awt.Stroke
+import sun.font.FontDesignMetrics
+import java.awt.*
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
 import java.net.URL
@@ -15,12 +13,12 @@ import javax.imageio.ImageIO
 object CheckInPicture {
     fun generate(url: String): BufferedImage {
         val image = ImageIO.read(URL(url))
-        return smallAvatar(image)
+        return compound(image)
     }
 
     private fun scaleByPercentage(inputImage: BufferedImage): BufferedImage {
-        val newWidth = 120
-        val newHeight = 120
+        val newWidth = 256
+        val newHeight = 256
 
         // 获取原始图像透明度类型
         val type = inputImage.colorModel.transparency
@@ -82,20 +80,89 @@ object CheckInPicture {
         return formatAvatarImage
     }
 
-    private fun backgroundAvatar(image: BufferedImage): BufferedImage {
-        return GaussianBlurUtil.blur(image, 15)
+    private fun backgroundAvatarBlur(image: BufferedImage) {
+        GaussianBlurUtil.blur(image, 15)
     }
 
     private fun tablet(): BufferedImage {
         return BufferedImage(540, 160, BufferedImage.TYPE_INT_ARGB).also {
             it.createGraphics().apply {
-                color = Color(0, 0, 0, 90)
+                color = Color(0, 0, 0, 0)
                 fillRect(0, 0, 540, 160)
+                dispose()
             }
         }
     }
 
-    private fun write() {}
+    private fun writtenTablet(tablet: BufferedImage): BufferedImage {
+        val width = tablet.width  // 540
+        val cFont = Font("Microsoft JhengHei", Font.BOLD, 24)
+        tablet.createGraphics().apply {
+            font = cFont
+            setRenderingHints(
+                mapOf(
+                    RenderingHints.KEY_ANTIALIASING to RenderingHints.VALUE_ANTIALIAS_ON,
+                    RenderingHints.KEY_STROKE_CONTROL to RenderingHints.VALUE_STROKE_DEFAULT,
+                    RenderingHints.KEY_TEXT_ANTIALIASING to RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                )
+            )
 
-    private fun compound() {}
+
+            val textHeight = FontDesignMetrics.getMetrics(cFont).height - 5
+            val textArray = arrayOf(
+                "锦瑟",
+                "签 到 成 功",
+                "Cuprum 1919810",
+                "签到天数  114       好感度  514"
+            )
+
+            var temp = textHeight
+            for (text in textArray) {
+                var textWidth = 0
+                text.forEach { textWidth += FontDesignMetrics.getMetrics(cFont).charWidth(it) }
+                drawString(text, (width - textWidth) / 2, temp)
+                temp += textHeight
+            }
+        }
+        return tablet
+    }
+
+    private fun handlerColor(tImage: BufferedImage): BufferedImage {
+        val image = BufferedImage(tImage.width, tImage.height, BufferedImage.TYPE_4BYTE_ABGR).also {
+            it.createGraphics().apply {
+                drawImage(tImage, 0, 0, null)
+                dispose()
+            }
+        }
+
+        val alpha = 190
+        for (x in 50 until 590) {
+            for (y in 427 until 587) {
+                var rgb = image.getRGB(x, y)
+                rgb = (alpha.shl(24)).or(rgb.and(0x00ffffff))
+                image.setRGB(x, y, rgb)
+            }
+        }
+
+        return image
+    }
+
+    private fun compound(image: BufferedImage): BufferedImage {
+        val smallAvatar = smallAvatar(image)
+        backgroundAvatarBlur(image)
+        val backgroundImage = handlerColor(image)
+        val tablet = writtenTablet(tablet())
+
+        backgroundImage.createGraphics().apply {
+            drawImage(tablet, 50, 425, null)
+            drawImage(
+                smallAvatar,
+                (backgroundImage.width - smallAvatar.width) / 2,
+                ((backgroundImage.width - smallAvatar.width) / 2) - 50,
+                null
+            )
+            dispose()
+        }
+        return backgroundImage
+    }
 }
