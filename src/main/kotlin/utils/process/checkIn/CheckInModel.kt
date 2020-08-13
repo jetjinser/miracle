@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
  * @param event bot 收到的群消息的事件, 用于构造 [checkInData]
  * @author jinser
  */
-class CheckInModel(event: GroupMessageEvent) {
+class CheckInModel(private val event: GroupMessageEvent) {
     private val checkInData: CheckInData = CheckInData(event)
 
     fun getCheckInfoArray() = arrayOf(
@@ -30,7 +30,9 @@ class CheckInModel(event: GroupMessageEvent) {
             return if (LocalDate.parse(lastCheckInDay, DateTimeFormatter.ISO_DATE) < now) {
                 favor = favorAlgorithm(checkInDays!!, favor!!)
                 cuprum = cuprumAlgorithm(favor!!, cuprum!!)
+                checkInDays = checkInDays!! + 1
                 lastCheckInDay = now.toString()
+                card = event.sender.nameCard
                 true
             } else {
                 false
