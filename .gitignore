@@ -5,3 +5,5 @@
 /src/test/
 /device.json
 /src/main/kotlin/Config.kt
+/data.db
+/src/main/resources/data.db
