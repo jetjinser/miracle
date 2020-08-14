@@ -1,14 +1,19 @@
 package plugins
 
+import com.google.gson.Gson
+import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
-import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.content
-import utils.model.ActivityModel
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Response
+import utils.network.Requests
+import utils.network.model.ActivityModel
+import java.io.IOException
 import java.net.URL
 
-@OptIn(UnstableDefault::class)
 fun Bot.random() {
     subscribeGroupMessages {
         startsWith("随机数") {
@@ -35,10 +40,29 @@ fun Bot.random() {
         }
 
         Regex("找点乐子|没事找事|找点事做") matchingReply {
-            Json.parse(ActivityModel.serializer(), URL("http://www.boredapi.com/api/activity/").readText()).let {
-                "你可以\n\t${it.activity}\n可行性:\t${it.accessibility}\n" +
-                        "类型:\t${it.type}\n参与人数:\t${it.participants}\n花费:\t${it.price}\n${it.link}"
-            }
+            Requests.get(
+                "http://www.boredapi.com/api/activity/",
+                object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        launch {
+                            reply("获取失败，也许是网络波动")
+                        }
+                    }
+                    override fun onResponse(call: Call, response: Response) {
+                        Gson().fromJson(
+                            response.body?.string(),
+                            ActivityModel::class.java
+                        ).let {
+                            launch {
+                                reply(
+                                    "你可以\n\t${it.activity}\n可行性:\t${it.accessibility}\n" +
+                                            "类型:\t${it.type}\n参与人数:\t${it.participants}\n花费:\t${it.price}\n${it.link}"
+                                )
+                            }
+                        }
+                    }
+                }
+            )
         }
     }
 }
