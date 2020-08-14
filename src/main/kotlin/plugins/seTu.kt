@@ -13,7 +13,7 @@ import java.io.IOException
 
 fun Bot.seTu() {
     subscribeGroupMessages {
-        Regex("(?:来一?[点张份]?)?[色瑟涩]图") matchingReply {
+        Regex("(?:来一?[点张份]?)?[色瑟涩]图来?") matching {
             reply("少女祈祷中")
             Requests.get("https://api.lolicon.app/setu/",
                 object : Callback {
@@ -26,31 +26,44 @@ fun Bot.seTu() {
                         Gson().fromJson(
                             response.body?.string(), LoliconSeTuModel::class.java
                         ).let {
-                            val url = it.data.first().url
-                            Requests.get(url,
-                                object : Callback {
-                                    override fun onFailure(call: Call, e: IOException) {
-                                        logger.warning("色图 onFailure")
-                                        launch { reply("图片获取失败") }
-                                    }
+                            try {
+                                val url = it.data.first().url
+                                Requests.get(url,
+                                    object : Callback {
+                                        override fun onFailure(call: Call, e: IOException) {
+                                            logger.warning("色图 onFailure")
+                                            launch { reply("图片获取失败") }
+                                        }
 
-                                    override fun onResponse(call: Call, response: Response) {
-                                        launch {
-                                            if (response.isSuccessful) {
-                                                response.body?.byteStream()?.sendAsImage()
-                                            }
-                                            "网络请求失败".let { info ->
-                                                logger.warning("色图 $info")
-                                                reply(info)
+                                        override fun onResponse(call: Call, response: Response) {
+                                            launch {
+                                                if (response.isSuccessful) {
+                                                    response.body?.byteStream()?.sendAsImage()
+                                                } else {
+                                                    "网络请求失败".let { info ->
+                                                        logger.warning("色图 $info")
+                                                        reply(info)
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            )
+                                )
+                            } catch (e: NoSuchElementException) {
+                                launch { reply("请求速度过快, 达到限制") }
+                            }
                         }
                     }
                 }
             )
+        }
+
+        Regex("[pP][识搜]图") matching {
+            // TODO
+        }
+
+        Regex("动[画漫][识搜]图") matching {
+            // TODO
         }
     }
 }

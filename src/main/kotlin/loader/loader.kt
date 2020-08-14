@@ -3,10 +3,7 @@ package loader
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.join
-import plugins.builtInReply
-import plugins.checkIn
-import plugins.random
-import plugins.seTu
+import plugins.*
 
 
 suspend fun main() {
@@ -21,6 +18,7 @@ suspend fun main() {
     bot.random()
     bot.checkIn()
     bot.seTu()
+    bot.reaction()
 
     bot.join()
 }
