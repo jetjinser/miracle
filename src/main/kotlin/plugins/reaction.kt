@@ -1,12 +1,15 @@
 package plugins
 
+import Config.owner
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.subscribeAlways
+import net.mamoe.mirai.getFriendOrNull
 
 fun Bot.reaction() {
     subscribeAlways<GroupEntranceAnnouncementChangeEvent> {
-        group.botAsMember.sendMessage("🔈 群公告已改变, 请及时查看 change by ${operator?.nick ?: nick}")
+        group.botAsMember.sendMessage("🔈 群公告已改变, 请及时查看\nchange by ${operatorOrBot.nameCardOrNick}")
     }
 
     subscribeAlways<GroupAllowAnonymousChatEvent> {
@@ -39,7 +42,7 @@ fun Bot.reaction() {
     subscribeAlways<MemberJoinEvent.Invite> {
         group.botAsMember.sendMessage("大家好")
     }
-    subscribeAlways<BotJoinGroupEvent.Invite> {
+    subscribeAlways<BotJoinGroupEvent> {
         group.botAsMember.sendMessage("大家好")
     }
 
@@ -48,8 +51,23 @@ fun Bot.reaction() {
         // TODO 自定义
     }
 
+    subscribeAlways<BotLeaveEvent.Kick> {
+        getFriendOrNull(owner)?.sendMessage(
+            "已被 ${operator.nameCard}(${operator.id}) 踢出群 ${group.name}(${group.id})"
+        )
+    }
+
+    subscribeAlways<BotLeaveEvent.Active> {
+        getFriendOrNull(owner)?.sendMessage(
+            "已离开群 ${group.name}(${group.id})"
+        )
+    }
+
     subscribeAlways<MemberLeaveEvent.Kick> {
-        group.botAsMember.sendMessage("🔈 ${member.nick}(${member.nameCard})被踢出本群 Operated by ${operator?.nick ?: nick}")
+        group.botAsMember.sendMessage(
+            "🔈 ${member.nick}${if (member.nameCard.isEmpty()) "" else "(${member.nameCard})"}被踢出本群 " +
+                    "\nOperated by ${operator?.nameCardOrNick ?: nick}"
+        )
     }
 
 //    subscribeAlways<MemberLeaveEvent.Quit> {
@@ -58,5 +76,12 @@ fun Bot.reaction() {
 
     subscribeAlways<BotInvitedJoinGroupRequestEvent> {
         ignore()
+        getFriendOrNull(owner)?.sendMessage(
+            "$groupName($groupId) 邀请入群, 已忽略"
+        )
+    }
+
+    subscribeAlways<MemberSpecialTitleChangeEvent> {
+        group.botAsMember.sendMessage("${member.nameCardOrNick}获得头衔：$new \nAwarded by ${operatorOrBot.nameCardOrNick}")
     }
 }

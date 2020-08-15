@@ -14,11 +14,16 @@ suspend fun main() {
         fileBasedDeviceInfo("device.json")
     }.alsoLogin()
 
-    bot.builtInReply()
-    bot.random()
-    bot.checkIn()
-    bot.seTu()
-    bot.reaction()
+    bot.apply {
+        builtInReply()
+        random()
+        checkIn()
+        seTu()
+        reaction()
+        bili()
+        button()
+        antiLightApp()
+    }
 
     bot.join()
 }

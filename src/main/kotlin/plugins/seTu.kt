@@ -59,11 +59,11 @@ fun Bot.seTu() {
         }
 
         Regex("[pP][识搜]图") matching {
-            // TODO
+            // TODO SauceNao.com
         }
 
         Regex("动[画漫][识搜]图") matching {
-            // TODO
+            // TODO trace.moe
         }
     }
 }

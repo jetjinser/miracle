@@ -1,18 +1,16 @@
 package plugins
 
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
-import kotlinx.serialization.UnstableDefault
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.content
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
+import utils.network.OkHttpUtil
 import utils.network.Requests
 import utils.network.model.ActivityModel
 import java.io.IOException
-import java.net.URL
 
 fun Bot.random() {
     subscribeGroupMessages {
@@ -49,7 +47,7 @@ fun Bot.random() {
                         }
                     }
                     override fun onResponse(call: Call, response: Response) {
-                        Gson().fromJson(
+                        OkHttpUtil.gson.fromJson(
                             response.body?.string(),
                             ActivityModel::class.java
                         ).let {
