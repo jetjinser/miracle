@@ -18,7 +18,7 @@ fun Bot.seTu() {
             Requests.get("https://api.lolicon.app/setu/",
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        logger.warning("色图 api onFailure")
+                        logger.error("色图 api onFailure")
                         launch { reply("api 获取失败") }
                     }
 

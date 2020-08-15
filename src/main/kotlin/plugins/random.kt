@@ -42,10 +42,10 @@ fun Bot.random() {
                 "http://www.boredapi.com/api/activity/",
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        launch {
-                            reply("获取失败，也许是网络波动")
-                        }
+                        logger.error("找点乐子 onFailure")
+                        launch { reply("获取失败，也许是网络波动") }
                     }
+
                     override fun onResponse(call: Call, response: Response) {
                         OkHttpUtil.gson.fromJson(
                             response.body?.string(),

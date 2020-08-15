@@ -18,7 +18,7 @@ fun Bot.reaction() {
         } else {
             "🔈 匿名被开启了"
         }
-        group.botAsMember.sendMessage(opt)
+        group.sendMessage(opt)
     }
 
     subscribeAlways<GroupAllowConfessTalkEvent> {
@@ -27,7 +27,7 @@ fun Bot.reaction() {
         } else {
             "🔈 坦白说被开启了"
         }
-        group.botAsMember.sendMessage(opt)
+        group.sendMessage(opt)
     }
 
     subscribeAlways<GroupAllowMemberInviteEvent> {
@@ -36,18 +36,18 @@ fun Bot.reaction() {
         } else {
             "🔈 现在群友不能邀请好友入群了"
         }
-        group.botAsMember.sendMessage(opt)
+        group.sendMessage(opt)
     }
 
     subscribeAlways<MemberJoinEvent.Invite> {
-        group.botAsMember.sendMessage("大家好")
+        group.sendMessage("大家好")
     }
     subscribeAlways<BotJoinGroupEvent> {
-        group.botAsMember.sendMessage("大家好")
+        group.sendMessage("大家好")
     }
 
     subscribeAlways<MemberJoinEvent.Active> {
-        group.botAsMember.sendMessage("欢迎")
+        group.sendMessage("欢迎")
         // TODO 自定义
     }
 
@@ -64,7 +64,7 @@ fun Bot.reaction() {
     }
 
     subscribeAlways<MemberLeaveEvent.Kick> {
-        group.botAsMember.sendMessage(
+        group.sendMessage(
             "🔈 ${member.nick}${if (member.nameCard.isEmpty()) "" else "(${member.nameCard})"}被踢出本群 " +
                     "\nOperated by ${operator?.nameCardOrNick ?: nick}"
         )
@@ -82,6 +82,6 @@ fun Bot.reaction() {
     }
 
     subscribeAlways<MemberSpecialTitleChangeEvent> {
-        group.botAsMember.sendMessage("${member.nameCardOrNick}获得头衔：$new \nAwarded by ${operatorOrBot.nameCardOrNick}")
+        group.sendMessage("${member.nameCardOrNick}获得头衔：$new \nAwarded by ${operatorOrBot.nameCardOrNick}")
     }
 }

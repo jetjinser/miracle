@@ -20,7 +20,7 @@ fun Bot.antiLightApp() {
         has<LightApp> {
             OkHttpUtil.gson.fromJson(
                 it.content,
-                BiliLightAppModel::class.java
+                LightAppModel::class.java
             ).let { model ->
                 var url = model.meta.detail.preview
                 "https://".let { scheme ->
@@ -33,7 +33,7 @@ fun Bot.antiLightApp() {
                     url,
                     object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
-                            logger.warning("antiLightApp.bili 请求 preview 图片时失败")
+                            logger.error("antiLightApp.bili 请求 preview 图片时失败")
                         }
 
                         override fun onResponse(call: Call, response: Response) {
@@ -59,7 +59,7 @@ fun Bot.antiLightApp() {
     }
 }
 
-data class BiliLightAppModel(
+data class LightAppModel(
     @SerializedName("meta")
     val meta: Meta
 ) {
