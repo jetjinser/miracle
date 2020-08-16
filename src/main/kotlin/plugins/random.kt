@@ -14,16 +14,16 @@ import java.io.IOException
 
 fun Bot.random() {
     subscribeGroupMessages {
-        startsWith("随机数") {
+        startsWith("随机数", removePrefix = true, trim = true) {
             reply(randomNumber(message.content))
         }
 
-        startsWith("打乱") {
+        startsWith("打乱", removePrefix = true, trim = true) {
             reply(
                 message.content
                     .split(" ")
                     .filter { it.isNotEmpty() }
-                    .drop(1).shuffled().joinToString(" ")
+                    .shuffled().joinToString(" ")
             )
         }
 
@@ -54,7 +54,7 @@ fun Bot.random() {
                             launch {
                                 reply(
                                     "你可以\n\t${it.activity}\n可行性:\t${it.accessibility}\n" +
-                                            "类型:\t${it.type}\n参与人数:\t${it.participants}\n花费:\t${it.price}\n${it.link}"
+                                            "类型:\t${it.type}\n参与人数:\t${it.participants}\n花费:\t${it.price}${if (it.link.isNotEmpty()) "\n${it.link}" else ""}"
                                 )
                             }
                         }
@@ -72,8 +72,8 @@ fun randomNumber(message: String): String {
     val msg = message.split(" ").filter { it.isNotEmpty() }
 
     try {
-        start = msg[1].toInt()
-        end = msg[2].toInt()
+        start = msg[0].toInt()
+        end = msg[1].toInt()
     } catch (e: NumberFormatException) {
         return "需要是数字"
     } catch (e: IndexOutOfBoundsException) {

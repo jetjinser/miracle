@@ -3,10 +3,12 @@ package plugins
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.nextMessage
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
+import utils.process.bili.AvBv
 import utils.network.OkHttpUtil
 import utils.network.Requests
 import utils.network.model.BiliCoverModel
@@ -14,14 +16,16 @@ import java.io.IOException
 
 @Suppress("BlockingMethodInNonBlockingContext")  // 哭了
 fun Bot.bili() {
-    // TODO 新番 / 新番时间表 | 根据链接(av/bv/cv)自动返回相关信息 | av <=> bv
+    // TODO 新番 / 新番时间表 | 根据链接(av/bv/cv)自动返回相关信息
     subscribeGroupMessages {
-        startsWith("提取封面", removePrefix = true, trim = true) { event ->
-            var aid = event.toIntOrNull()
+        startsWith("提取封面", removePrefix = true, trim = true) { m ->
+            var aid = m.toIntOrNull() ?: AvBv.bvToAv(m)?.toInt()
             while (aid == null) {
-                reply("请告诉我av号")
-                val msg = nextMessage { message.contentToString().toIntOrNull() != null }
-                aid = msg.contentToString().trim().toIntOrNull()
+                reply("请告诉我av号或者bv号")
+                val msg = nextMessage {
+                    message.content.toIntOrNull() != null || AvBv.bvToAv(message.content)?.toInt() != null
+                }
+                aid = msg.content.trim().toIntOrNull() ?: AvBv.bvToAv(msg.content)?.toInt()
             }
             val url = "https://api.bilibili.com/x/web-interface/view?aid=$aid"
             logger.info("Request $url")
@@ -57,7 +61,6 @@ fun Bot.bili() {
                                     }
                                 }
                             )
-
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-package utils
+package utils.process.bili
 
 import org.bouncycastle.pqc.math.linearalgebra.IntegerFunctions
 
@@ -25,8 +25,10 @@ object AvBv {
         return r.joinToString("")
     }
 
-    fun bvToAv(bv: String): Long {
-        require(bv.length == 12)
+    fun bvToAv(bv: String): Long? {
+        if (bv.length != 12) {
+            return null
+        }
         var r = 0L
         for (i in 0 until 10) {
             r += tr[bv[s[i]].toString()]!! * IntegerFunctions.pow(58L, i)
