@@ -21,5 +21,8 @@ object OkHttpUtil {
         return singleton
     }
 
-    val gson = Gson()
+    val gson: Gson by lazy {
+        logger.info("Gson Instantiate")
+        Gson()
+    }
 }
