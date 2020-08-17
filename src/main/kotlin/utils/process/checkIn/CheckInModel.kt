@@ -1,6 +1,7 @@
 package utils.process.checkIn
 
 import net.mamoe.mirai.message.GroupMessageEvent
+import utils.data.CheckInData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

@@ -14,7 +14,8 @@ object BotDataBase {
         if (singleton == null) {
             synchronized(OkHttpUtil::class.java) {
                 if (singleton == null) {
-                    singleton = Database.connect("jdbc:sqlite:C:/Users/cmdrj/Desktop/archived/miracle/src/main/resources/data.db")
+                    singleton =
+                        Database.connect("jdbc:sqlite:C:/Users/cmdrj/Desktop/archived/miracle/src/main/resources/data.db")
                 }
             }
         }
@@ -36,5 +37,11 @@ object BotDataBase {
         val tip = varchar("tip")
         val date = varchar("date")
         val qqId = long("qq_id")
+    }
+
+    object Cache : Table<Nothing>("Cache") {
+        val id = int("id").primaryKey()
+        val messageId = int("message_id")
+        val content = varchar("content")
     }
 }

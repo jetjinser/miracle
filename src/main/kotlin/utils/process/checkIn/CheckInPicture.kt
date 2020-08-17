@@ -82,7 +82,7 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
     }
 
     private fun backgroundAvatarBlur(image: BufferedImage) {
-        GaussianBlurUtil.blur(image, 15)
+        GaussianBlur.blur(image, 15)
     }
 
     private fun tablet(): BufferedImage {
@@ -138,6 +138,7 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
         val image = BufferedImage(tImage.width, tImage.height, BufferedImage.TYPE_4BYTE_ABGR).also {
             it.createGraphics().apply {
                 drawImage(tImage, 0, 0, null)
+                scale(640.0, 640.0)
                 dispose()
             }
         }

@@ -1,4 +1,4 @@
-package utils.process.checkIn
+package utils.data
 
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
@@ -16,7 +16,7 @@ import utils.logger.BotLogger
 class CheckInData(private val event: GroupMessageEvent) {
     private var query: Query? = null
     private val dataBase: Database? = BotDataBase.getInstance()
-    private val logger = BotLogger.logger("CheckInData")
+    private val logger = BotLogger.logger("CID")
 
     private var _card: String? = null
     private var _checkInDays: Int? = null

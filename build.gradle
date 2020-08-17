@@ -17,6 +17,7 @@ dependencies {
     // mirai
     implementation "net.mamoe:mirai-core:1.1.3"
     implementation "net.mamoe:mirai-core-qqandroid:1.1.3"
+    implementation "net.mamoe:mirai-serialization:1.1.3"
 
     // The needs of the bot
     // 网络请求: okhttp

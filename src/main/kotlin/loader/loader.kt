@@ -2,8 +2,12 @@ package loader
 
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
+import net.mamoe.mirai.event.subscribe
+import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.join
 import plugins.*
+import utils.data.MessageCacheData
+import utils.data.MessageCacheData.append
 
 
 suspend fun main() {
@@ -23,6 +27,7 @@ suspend fun main() {
         bili()
         button()
         antiLightApp()
+        recode()
     }
 
     bot.join()

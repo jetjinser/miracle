@@ -7,7 +7,7 @@ import java.awt.image.PixelGrabber
 import java.io.IOException
 import kotlin.math.abs
 
-object GaussianBlurUtil {
+object GaussianBlur {
     /**
      * 模糊执行方法
      *

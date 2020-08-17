@@ -14,17 +14,22 @@ import utils.network.Requests
 import utils.network.model.BiliViewModel
 import utils.process.bili.AvBv
 import java.io.IOException
+import java.net.URL
 
 @Suppress("BlockingMethodInNonBlockingContext")  // 哭了
 fun Bot.bili() {
-    // TODO 新番 / 新番时间表 | cv
     subscribeGroupMessages {
         startsWith("提取封面", removePrefix = true, trim = true) { m ->
             var aid = m.toIntOrNull() ?: AvBv.bvToAv(m)?.toInt()
+            var mg: String? = null
             while (aid == null) {
-                reply("请告诉我av号或者bv号")
-                val msg = nextMessage {
+                reply("请告诉我av号或者bv号 [取消]")
+                val msg = nextMessage(timeoutMillis = 120000) {
+                    mg = message.content
                     message.content.toIntOrNull() != null || AvBv.bvToAv(message.content)?.toInt() != null
+                }
+                if (mg in listOf("算了", "取消")) {
+                    return@startsWith
                 }
                 aid = msg.content.trim().toIntOrNull() ?: AvBv.bvToAv(msg.content)?.toInt()
             }
@@ -45,23 +50,8 @@ fun Bot.bili() {
                             BiliViewModel::class.java
                         ).let {
                             logger.info("提取到图片url: ${it.data.pic}")
-                            Requests.get(
-                                it.data.pic,
-                                object : Callback {
-                                    override fun onFailure(call: Call, e: IOException) {
-                                        logger.error("提取封面 下载图片 onFailure")
-                                        launch { reply("图片请求失败") }
-                                    }
-
-                                    override fun onResponse(call: Call, response: Response) {
-                                        logger.info("发送图片")
-                                        launch {
-                                            response.body?.byteStream()?.sendAsImage()
-                                                ?: reply("没有下载到图片")
-                                        }
-                                    }
-                                }
-                            )
+                            val pic = URL(it.data.pic)
+                            launch { pic.sendAsImage() }
                         }
                     }
                 }
@@ -126,6 +116,11 @@ fun Bot.bili() {
 
         Regex("""\s*(?i)cv(?-i)\d{5,7}\s*""") matching {
             println("cv $it")
+            // TODO cv
+        }
+
+        Regex("""\s*新番(时间表)?\s*""") matching {
+            // TODO 新番 / 新番时间表
         }
     }
 }
