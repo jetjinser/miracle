@@ -58,7 +58,7 @@ fun Bot.bili() {
             )
         }
 
-        Regex("""\s*(?i)((av\d{5,13})|(BV\w{10}))\s*""") matching {
+        Regex(""".*(?i)((av\d{5,13})|(BV\w{10})).*""") matching {
             val aid = it.drop(2).toIntOrNull() ?: AvBv.bvToAv(it)?.toInt()
             if (aid != null) {
                 val url = "https://api.bilibili.com/x/web-interface/view?aid=$aid"

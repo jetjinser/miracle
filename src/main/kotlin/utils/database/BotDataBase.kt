@@ -44,4 +44,13 @@ object BotDataBase {
         val messageId = int("message_id")
         val content = varchar("content")
     }
+
+    object Thesaurus : Table<Nothing>("Thesaurus") {
+        val id = int("id").primaryKey()
+        val qqId = long("qq_id")
+        val question = varchar("question")
+        val answer = varchar("answer")
+        val groupId = long("group_id")
+        val global = int("global") // 0 or 1
+    }
 }

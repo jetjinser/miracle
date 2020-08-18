@@ -1,6 +1,7 @@
 package utils.process.checkIn
 
 import sun.font.FontDesignMetrics
+import utils.logger.BotLogger
 import java.awt.*
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
@@ -146,9 +147,14 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
         val alpha = 190
         for (x in 50 until 590) {
             for (y in 427 until 587) {
-                var rgb = image.getRGB(x, y)
-                rgb = (alpha.shl(24)).or(rgb.and(0x00ffffff))
-                image.setRGB(x, y, rgb)
+                try {
+                    var rgb = image.getRGB(x, y)
+                    rgb = (alpha.shl(24)).or(rgb.and(0x00ffffff))
+                    image.setRGB(x, y, rgb)
+                } catch (e: ArrayIndexOutOfBoundsException) {
+                    BotLogger.logger("CIP").error("qq头像尺寸不足 640*640, 略过超出部分")
+                    return image
+                }
             }
         }
 

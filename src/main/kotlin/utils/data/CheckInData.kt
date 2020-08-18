@@ -2,6 +2,7 @@ package utils.data
 
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
+import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.message.GroupMessageEvent
 import utils.database.BotDataBase
 import utils.database.BotDataBase.User
@@ -23,6 +24,20 @@ class CheckInData(private val event: GroupMessageEvent) {
     private var _lastCheckInDay: String? = null
     private var _cuprum: Int? = null
     private var _favor: Int? = null
+
+    fun consumeCuprum(amount: Int): Boolean {
+        val cuprum = this.cuprum
+        if (cuprum != null) {
+            if (cuprum < amount) {
+                logger.info("${event.sender.nameCardOrNick} 当前铜币 $cuprum 枚, 不足消费 $amount")
+                return false
+            }
+            this.cuprum = cuprum - amount
+            logger.info("${event.sender.nameCardOrNick} 消费 $amount 枚铜币")
+            return true
+        }
+        return false
+    }
 
     /**
      * 更新 [dataBase] 和 [query]
