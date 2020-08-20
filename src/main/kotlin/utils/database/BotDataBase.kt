@@ -1,10 +1,7 @@
 package utils.database
 
 import me.liuwj.ktorm.database.Database
-import me.liuwj.ktorm.schema.Table
-import me.liuwj.ktorm.schema.int
-import me.liuwj.ktorm.schema.long
-import me.liuwj.ktorm.schema.varchar
+import me.liuwj.ktorm.schema.*
 import utils.network.OkHttpUtil
 
 object BotDataBase {
@@ -46,11 +43,16 @@ object BotDataBase {
     }
 
     object Thesaurus : Table<Nothing>("Thesaurus") {
-        val id = int("id").primaryKey()
         val qqId = long("qq_id")
-        val question = varchar("question")
-        val answer = varchar("answer")
-        val groupId = long("group_id")
+        val question = varchar("question").primaryKey()
+        val answer = varchar("answer").primaryKey()
+        val groupId = long("group_id").primaryKey()
         val global = int("global") // 0 or 1
+    }
+
+    object GroupSetting : Table<Nothing>("GroupSetting") {
+        val id = int("id").primaryKey()
+        val groupId = long("group_id")
+        val qaProbability = double("qa_probability")
     }
 }

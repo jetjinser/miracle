@@ -26,6 +26,8 @@ suspend fun main() {
         antiLightApp()
         recode()
         thesaurus()
+        setting()
+        music()
     }
 
     bot.join()

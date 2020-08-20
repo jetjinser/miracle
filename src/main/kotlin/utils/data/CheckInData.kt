@@ -11,8 +11,8 @@ import utils.logger.BotLogger
 /**
  * 处理签到的数据
  * @param event 机器人收到的群消息的事件
- * @see GroupMessageEvent
  * @author jinser
+ * @see GroupMessageEvent
  */
 class CheckInData(private val event: GroupMessageEvent) {
     private var query: Query? = null
@@ -25,40 +25,18 @@ class CheckInData(private val event: GroupMessageEvent) {
     private var _cuprum: Int? = null
     private var _favor: Int? = null
 
-    fun consumeCuprum(amount: Int): Boolean {
+    fun consumeCuprum(amount: Int): Int? {
         val cuprum = this.cuprum
         if (cuprum != null) {
             if (cuprum < amount) {
                 logger.info("${event.sender.nameCardOrNick} 当前铜币 $cuprum 枚, 不足消费 $amount")
-                return false
+                return null
             }
             this.cuprum = cuprum - amount
             logger.info("${event.sender.nameCardOrNick} 消费 $amount 枚铜币")
-            return true
+            return cuprum
         }
-        return false
-    }
-
-    /**
-     * 更新 [dataBase] 和 [query]
-     * *愤怒* query 是个生成器
-     */
-    private fun update() {
-        query = dataBase?.from(User)?.select()?.where { User.QQId eq event.sender.id }
-
-        if (query?.totalRecords == 0) {
-            registeredUser()
-            logger.info("新增用户 ${event.senderName}, 已录入数据库")
-            query = dataBase?.from(User)?.select()?.where { User.QQId eq event.sender.id }
-        }
-
-        query?.forEach {
-            _card = it[User.card]
-            _checkInDays = it[User.checkInDays]
-            _lastCheckInDay = it[User.lastCheckInDay]
-            _cuprum = it[User.cuprum]
-            _favor = it[User.favor]
-        }
+        return null
     }
 
     /**
@@ -77,7 +55,26 @@ class CheckInData(private val event: GroupMessageEvent) {
     }
 
     init {
-        update()
+        query = dataBase?.from(User)?.select()?.where { User.QQId eq event.sender.id }
+
+        if (query?.totalRecords == 0) {
+            registeredUser()
+            logger.info("新增用户 ${event.senderName}, 已录入数据库")
+
+            _favor = 0
+            _cuprum = 0
+            _card = event.sender.nameCard
+            _checkInDays = 0
+            _lastCheckInDay = "1970-01-01"
+        } else {
+            query?.forEach {
+                _card = it[User.card]
+                _checkInDays = it[User.checkInDays]
+                _lastCheckInDay = it[User.lastCheckInDay]
+                _cuprum = it[User.cuprum]
+                _favor = it[User.favor]
+            }
+        }
     }
 
     /**
