@@ -1,6 +1,6 @@
 package plugins
 
-import Config.owner
+import SecretConfig.owner
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*

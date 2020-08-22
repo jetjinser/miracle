@@ -1,10 +1,12 @@
 package utils.process.checkIn
 
+import com.zzhoujay.lowpoly.LowPoly
 import sun.font.FontDesignMetrics
-import utils.logger.BotLogger
 import java.awt.*
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.net.URL
 import javax.imageio.ImageIO
 
@@ -13,9 +15,14 @@ import javax.imageio.ImageIO
  * @author jinser
  */
 class CheckInPicture(private val url: String, private val checkInModel: CheckInModel) {
-    fun generate(): BufferedImage {
+    enum class BackgroundImageType {
+        LoyPoly,
+        Gaussian
+    }
+
+    fun generate(backgroundImageType: BackgroundImageType): BufferedImage {
         val image = ImageIO.read(URL(url))
-        return compound(image)
+        return compound(image, backgroundImageType)
     }
 
     private fun scaleByPercentage(inputImage: BufferedImage): BufferedImage {
@@ -82,14 +89,10 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
         return formatAvatarImage
     }
 
-    private fun backgroundAvatarBlur(image: BufferedImage) {
-        GaussianBlur.blur(image, 15)
-    }
-
     private fun tablet(): BufferedImage {
         return BufferedImage(540, 160, BufferedImage.TYPE_INT_ARGB).also {
             it.createGraphics().apply {
-                color = Color(0, 0, 0, 0)
+                color = Color(0, 0, 0, 90)
                 fillRect(0, 0, 540, 160)
                 dispose()
             }
@@ -111,7 +114,7 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
 
 
             val textHeight = FontDesignMetrics.getMetrics(cFont).height - 5
-            val textArray = checkInModel.getCheckInfoArray()
+            val textArray = checkInModel.checkInfoArray
 
             var temp = textHeight
             for (text in textArray.dropLast(1)) {
@@ -139,7 +142,14 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
         val image = BufferedImage(tImage.width, tImage.height, BufferedImage.TYPE_4BYTE_ABGR).also {
             it.createGraphics().apply {
                 drawImage(tImage, 0, 0, null)
-                scale(640.0, 640.0)
+                dispose()
+            }
+        }
+
+        val img = image.getScaledInstance(640, 640, Image.SCALE_DEFAULT)
+        val ig = BufferedImage(640, 640, BufferedImage.TYPE_4BYTE_ABGR).also {
+            it.graphics.apply {
+                drawImage(img, 0, 0, null)
                 dispose()
             }
         }
@@ -147,24 +157,34 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
         val alpha = 190
         for (x in 50 until 590) {
             for (y in 427 until 587) {
-                try {
-                    var rgb = image.getRGB(x, y)
-                    rgb = (alpha.shl(24)).or(rgb.and(0x00ffffff))
-                    image.setRGB(x, y, rgb)
-                } catch (e: ArrayIndexOutOfBoundsException) {
-                    BotLogger.logger("CIP").error("qq头像尺寸不足 640*640, 略过超出部分")
-                    return image
-                }
+                var rgb = ig.getRGB(x, y)
+                rgb = (alpha.shl(24)).or(rgb.and(0x00ffffff))
+                ig.setRGB(x, y, rgb)
             }
         }
 
-        return image
+        return ig
     }
 
-    private fun compound(image: BufferedImage): BufferedImage {
+    private fun lowPoly(image: BufferedImage): BufferedImage {
+        val byteArrayInputStream = ByteArrayOutputStream()
+        ImageIO.write(image, "png", byteArrayInputStream)
+        val inputStream = ByteArrayInputStream(byteArrayInputStream.toByteArray())
+        val outputStream = ByteArrayOutputStream()
+        LowPoly.generate(inputStream, outputStream, 30, 1.0F, true, "png", false, 30)
+        val stream = ByteArrayInputStream(outputStream.toByteArray())
+        return ImageIO.read(stream)
+    }
+
+    private fun compound(image: BufferedImage, backgroundImageType: BackgroundImageType): BufferedImage {
         val smallAvatar = smallAvatar(image)
-        backgroundAvatarBlur(image)
-        val backgroundImage = handlerColor(image)
+
+        val bigAvatar = when (backgroundImageType) {
+            BackgroundImageType.LoyPoly -> lowPoly(image)
+            BackgroundImageType.Gaussian -> GaussianBlur.blur(image, 15)
+        }
+
+        val backgroundImage = handlerColor(bigAvatar)
         val tablet = writtenTablet(tablet())
 
         backgroundImage.createGraphics().apply {

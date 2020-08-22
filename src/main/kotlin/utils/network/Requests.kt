@@ -1,9 +1,7 @@
 package utils.network
 
 
-import okhttp3.Callback
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 
 
 object Requests {
@@ -15,6 +13,16 @@ object Requests {
             .url(url)
             .build()
         client?.newCall(request)?.enqueue(callback)
+    }
+
+    fun post(url: String, requestBody: RequestBody? = null): Response? {
+        var rb = requestBody
+        if (rb == null) rb = FormBody.Builder().build()
+        val request = Request.Builder()
+            .post(rb)
+            .url(url)
+            .build()
+        return client?.newCall(request)?.execute()
     }
 
     fun head(url: String): Response? {

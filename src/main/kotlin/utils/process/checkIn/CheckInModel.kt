@@ -2,6 +2,7 @@ package utils.process.checkIn
 
 import net.mamoe.mirai.message.GroupMessageEvent
 import utils.data.CheckInData
+import utils.data.TipsData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -13,13 +14,14 @@ import java.time.format.DateTimeFormatter
 class CheckInModel(private val event: GroupMessageEvent) {
     private val checkInData: CheckInData = CheckInData(event)
 
-    fun getCheckInfoArray() = arrayOf(
-        checkInData.card,
-        "签 到 成 功",
-        "Cuprum ${checkInData.cuprum}",
-        "签到天数 ${checkInData.checkInDays}       好感度 ${checkInData.favor}",
-        "tips" // TODO tips 540 px 宽
-    )
+    val checkInfoArray
+        get() = arrayOf(
+            checkInData.card,
+            "签 到 成 功",
+            "Cuprum ${checkInData.cuprum}",
+            "签到天数 ${checkInData.checkInDays}       好感度 ${checkInData.favor}",
+            TipsData.tip ?: "null"
+        )
 
     /**
      * 签到函数

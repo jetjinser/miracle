@@ -1,7 +1,7 @@
 package plugins
 
-import Config.loliconSeTuApiKey
-import Config.sauceNaoApiKey
+import SecretConfig.loliconSeTuApiKey
+import SecretConfig.sauceNaoApiKey
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
@@ -21,9 +21,7 @@ import utils.network.Requests
 import utils.network.model.LoliconSeTuModel
 import utils.network.model.SauceNaoModel
 import java.io.IOException
-import java.math.BigInteger
 import java.net.URL
-import java.security.MessageDigest
 
 @Suppress("BlockingMethodInNonBlockingContext")  // 哭了
 fun Bot.seTu() {

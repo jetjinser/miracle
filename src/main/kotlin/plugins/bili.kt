@@ -47,13 +47,19 @@ fun Bot.bili() {
                     }
 
                     override fun onResponse(call: Call, response: Response) {
-                        OkHttpUtil.gson.fromJson(
-                            response.body?.string(),
-                            BiliViewModel::class.java
-                        ).let {
-                            logger.info("提取到图片url: ${it.data.pic}")
-                            val pic = URL(it.data.pic)
-                            launch { pic.sendAsImage() }
+                        response.use { resp ->
+                            OkHttpUtil.gson.fromJson(
+                                resp.body?.string(),
+                                BiliViewModel::class.java
+                            ).let { model ->
+                                logger.info("提取到图片url: ${model.data.pic}")
+                                val pic = URL(model.data.pic).openConnection()
+                                launch {
+                                    pic.getInputStream().use {
+                                        it.sendAsImage()
+                                    }
+                                }
+                            }
                         }
                     }
                 }

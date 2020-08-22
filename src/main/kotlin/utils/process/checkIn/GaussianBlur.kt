@@ -19,10 +19,16 @@ object GaussianBlur {
     fun blur(img: BufferedImage, radius: Int): BufferedImage {
         val height = img.height
         val width = img.width
-        var values = getPixArray(img, width, height)
+        val newImage = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR).also {
+            it.createGraphics()?.apply {
+                drawImage(img, 0, 0, null)
+                dispose()
+            }
+        }
+        var values = getPixArray(newImage, width, height)
         values = doBlur(values, width, height, radius)
-        img.setRGB(0, 0, width, height, values, 0, width)
-        return img
+        newImage.setRGB(0, 0, width, height, values, 0, width)
+        return newImage
     }
 
     /**

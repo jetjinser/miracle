@@ -1,6 +1,7 @@
 package utils.database
 
 import me.liuwj.ktorm.database.Database
+import me.liuwj.ktorm.dsl.desc
 import me.liuwj.ktorm.schema.*
 import utils.network.OkHttpUtil
 
@@ -34,6 +35,13 @@ object BotDataBase {
         val tip = varchar("tip")
         val date = varchar("date")
         val qqId = long("qq_id")
+
+        /**
+         * - **null**: 未审核
+         * - **0**: 不通过
+         * - **1**: 通过
+         */
+        val review = int("review")
     }
 
     object Cache : Table<Nothing>("Cache") {

@@ -1,6 +1,6 @@
 package loader
 
-import Config
+import SecretConfig
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.join
@@ -9,8 +9,8 @@ import plugins.*
 
 suspend fun main() {
     val bot = Bot(
-        Config.qq,
-        Config.password
+        SecretConfig.qq,
+        SecretConfig.password
     ) {
         fileBasedDeviceInfo("device.json")
     }.alsoLogin()
