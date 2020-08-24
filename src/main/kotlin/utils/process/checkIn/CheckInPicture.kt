@@ -156,7 +156,7 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
 
         val alpha = 190
         for (x in 50 until 590) {
-            for (y in 427 until 587) {
+            for (y in 425 until 585) {
                 var rgb = ig.getRGB(x, y)
                 rgb = (alpha.shl(24)).or(rgb.and(0x00ffffff))
                 ig.setRGB(x, y, rgb)
@@ -192,7 +192,7 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
             drawImage(
                 smallAvatar,
                 (backgroundImage.width - smallAvatar.width) / 2,
-                ((backgroundImage.width - smallAvatar.width) / 2) - 50,
+                ((backgroundImage.width - smallAvatar.width) / 2) - 55,
                 null
             )
             dispose()

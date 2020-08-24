@@ -12,6 +12,7 @@ import utils.data.TipsData
 import utils.process.checkIn.CheckInModel
 import utils.process.checkIn.CheckInPicture
 import utils.process.checkIn.CheckInPicture.BackgroundImageType
+import utils.subscriber.subscribeOwnerMessage
 import java.awt.Font
 
 
@@ -50,26 +51,6 @@ fun Bot.checkIn() {
             reply(msg)
         }
 
-
-        case("审核", trim = true) {
-            if (sender.id != owner) return@case
-            val pendingTip = TipsData.getPendingTips()
-            if (pendingTip != null) {
-                val id = pendingTip.id
-                reply(
-                    "> $id\ntip: [${pendingTip.tip}]\ndate: ${pendingTip.date}\nSubmitted by ${pendingTip.qqId}\nvia checkInTip"
-                )
-                val msg = nextMessage { true }
-                if (msg.content == "好") {
-                    TipsData.review(id, true)
-                    reply("已通过")
-                } else {
-                    reply("已标记为不通过")
-                    TipsData.review(id, false)
-                }
-            } else reply("暂时没有更多了")
-        }
-
         case("历史提交", trim = true) {
             val history = TipsData.getHistory(sender.id)
             if (history != null) {
@@ -94,6 +75,26 @@ fun Bot.checkIn() {
                     add("via checkInTip")
                 }.send()
             } else reply("现在没有正在审核的tip")
+        }
+    }
+
+    subscribeOwnerMessage {
+        case("审核", trim = true) {
+            val pendingTip = TipsData.getPendingTips()
+            if (pendingTip != null) {
+                val id = pendingTip.id
+                reply(
+                    "> $id\ntip: [${pendingTip.tip}]\ndate: ${pendingTip.date}\nSubmitted by ${pendingTip.qqId}\nvia checkInTip"
+                )
+                val msg = nextMessage { true }
+                if (msg.content == "好") {
+                    TipsData.review(id, true)
+                    reply("已通过")
+                } else {
+                    reply("已标记为不通过")
+                    TipsData.review(id, false)
+                }
+            } else reply("暂时没有更多了")
         }
     }
 }
