@@ -1,35 +1,39 @@
 package utils.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class BiliCvModel(
-    @SerializedName("data")
+    @SerialName("data")
     val `data`: Data
 ) {
+    @Serializable
     data class Data(
-        @SerializedName("author_name")
+        @SerialName("author_name")
         val authorName: String,
-        @SerializedName("stats")
+        @SerialName("stats")
         val stats: Stats,
-        @SerializedName("title")
+        @SerialName("title")
         val title: String
     )
 
+    @Serializable
     data class Stats(
-        @SerializedName("coin")
+        @SerialName("coin")
         val coin: Int,
-        @SerializedName("dislike")
+        @SerialName("dislike")
         val dislike: Int,
-        @SerializedName("favorite")
+        @SerialName("favorite")
         val favorite: Int,
-        @SerializedName("like")
+        @SerialName("like")
         val like: Int,
-        @SerializedName("reply")
+        @SerialName("reply")
         val reply: Int,
-        @SerializedName("share")
+        @SerialName("share")
         val share: Int,
-        @SerializedName("view")
+        @SerialName("view")
         val view: Int
     )
 }

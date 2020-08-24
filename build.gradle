@@ -19,10 +19,7 @@ dependencies {
     implementation "net.mamoe:mirai-core-qqandroid:1.2.1"
 
     // The needs of the bot
-    // 网络请求: okhttp
-    implementation 'com.squareup.okhttp3:okhttp:4.8.1'
-    // 序列化
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation("io.ktor:ktor-client-serialization:1.4.0")
 
     // SQL ORM Ktorm
     compile "me.liuwj.ktorm:ktorm-core:3.0.0"

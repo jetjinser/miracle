@@ -1,16 +1,15 @@
 package utils.database
 
 import me.liuwj.ktorm.database.Database
-import me.liuwj.ktorm.dsl.desc
 import me.liuwj.ktorm.schema.*
-import utils.network.OkHttpUtil
+import utils.network.KtorClient
 
 object BotDataBase {
     private var singleton: Database? = null
 
     fun getInstance(): Database? {
         if (singleton == null) {
-            synchronized(OkHttpUtil::class.java) {
+            synchronized(KtorClient::class.java) {
                 if (singleton == null) {
                     singleton =
                         Database.connect("jdbc:sqlite:C:/Users/cmdrj/Desktop/archived/miracle/src/main/resources/data.db")

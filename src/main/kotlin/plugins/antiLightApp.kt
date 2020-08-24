@@ -1,89 +1,38 @@
 package plugins
 
-import com.google.gson.JsonSyntaxException
+import io.ktor.client.request.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.LightApp
-import com.google.gson.annotations.SerializedName
-import kotlinx.coroutines.launch
 import net.mamoe.mirai.message.data.buildMessageChain
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import utils.network.OkHttpUtil
-import utils.network.Requests
-import java.io.IOException
-import java.lang.NullPointerException
+import utils.network.KtorClient
+import utils.network.model.AntiLightAppModel
 
 
 fun Bot.antiLightApp() {
     subscribeGroupMessages {
         has<LightApp> {
-            OkHttpUtil.gson.fromJson(
-                it.content,
-                LightAppModel::class.java
-            ).let { model ->
-                try {
-                    var url = model.meta.detail.preview
-                    "https://".let { scheme ->
-                        if (!url.startsWith(scheme) && !url.startsWith("http://")) {
-                            url = scheme + url
-                        }
-                    }
-                    logger.info("Request $url")
-                    Requests.get(
-                        url,
-                        object : Callback {
-                            override fun onFailure(call: Call, e: IOException) {
-                                logger.error("antiLightApp.bili 请求 preview 图片时失败")
-                            }
+            val client = KtorClient.getInstance() ?: return@has
+            val model = client.get<AntiLightAppModel>(it.content)
 
-                            override fun onResponse(call: Call, response: Response) {
-                                val doCurl: String? = try {
-                                    model.meta.detail.qqDoCurl?.split("?")?.first()
-                                } catch (e: JsonSyntaxException) {
-                                    null
-                                }
-                                val detail = model.meta.detail
-                                launch {
-                                    buildMessageChain {
-                                        add("@${detail.title}\n")
-                                        response.body?.byteStream()?.let { image -> uploadImage(image) }
-                                            ?.let { imageMessage -> add(imageMessage) }
-                                        add("${detail.desc}\n${doCurl ?: "无法获取链接: ${detail.title}不支持或版本过低"}\nvia antiLightApp")
-                                    }.send()
-                                }
-                            }
-                        }
-                    )
-                } catch (e: NullPointerException) {
-                    logger.warning("antiLightApp 失败 或网易云分享误判, 略过")
+            var url = model.meta.detail.preview
+            "https://".let { scheme ->
+                if (!url.startsWith(scheme) && !url.startsWith("http://")) {
+                    url = scheme + url
                 }
             }
+            logger.info("Request $url")
+
+            val byteArray = client.get<ByteArray>(url)
+
+            val detail = model.meta.detail
+            val doCurl: String? = model.meta.detail.qqDoCurl?.split("?")?.first()
+
+            buildMessageChain {
+                add("@${detail.title}\n")
+                add(byteArray.inputStream().uploadAsImage())
+                add("${detail.desc}\n${doCurl ?: "无法获取链接: ${detail.title}不支持或版本过低"}\nvia antiLightApp")
+            }.send()
         }
     }
 }
-
-data class LightAppModel(
-    @SerializedName("meta")
-    val meta: Meta
-) {
-    data class Meta(
-        @SerializedName("detail_1")
-        val detail: Detail
-    )
-
-    data class Detail(
-        @SerializedName("desc")
-        val desc: String,
-        @SerializedName("preview")
-        val preview: String,
-        @SerializedName("qqdocurl")
-        val qqDoCurl: String?,
-        @SerializedName("title")
-        val title: String
-    )
-}
-
-
-

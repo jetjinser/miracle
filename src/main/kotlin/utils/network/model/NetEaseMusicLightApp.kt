@@ -1,78 +1,85 @@
 package utils.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class NetEaseMusicLightApp(
-    @SerializedName("app")
+    @SerialName("app")
     val app: String,
-    @SerializedName("config")
+    @SerialName("config")
     val config: Config,
-    @SerializedName("desc")
+    @SerialName("desc")
     val desc: String,
-    @SerializedName("extra")
+    @SerialName("extra")
     val extra: Extra,
-    @SerializedName("meta")
+    @SerialName("meta")
     val meta: Meta,
-    @SerializedName("prompt")
+    @SerialName("prompt")
     val prompt: String,
-    @SerializedName("ver")
+    @SerialName("ver")
     val ver: String,
-    @SerializedName("view")
+    @SerialName("view")
     val view: String
 ) {
+    @Serializable
     data class Config(
-        @SerializedName("autosize")
+        @SerialName("autosize")
         val autosize: Boolean,
-        @SerializedName("ctime")
+        @SerialName("ctime")
         val ctime: Long,
-        @SerializedName("forward")
+        @SerialName("forward")
         val forward: Boolean,
-        @SerializedName("token")
+        @SerialName("token")
         val token: String,
-        @SerializedName("type")
+        @SerialName("type")
         val type: String
     )
 
+    @Serializable
     data class Extra(
-        @SerializedName("app_type")
+        @SerialName("app_type")
         val appType: Int,
-        @SerializedName("appid")
+        @SerialName("appid")
         val appid: Int,
-        @SerializedName("msg_seq")
+        @SerialName("msg_seq")
         val msgSeq: Long
     )
 
+    @Serializable
     data class Meta(
-        @SerializedName("music")
+        @SerialName("music")
         val music: MusicX
     )
 
+    @Serializable
     data class MusicX(
-        @SerializedName("action")
+        @SerialName("action")
         val action: String,
-        @SerializedName("android_pkg_name")
+        @SerialName("android_pkg_name")
         val androidPkgName: String,
-        @SerializedName("app_type")
+        @SerialName("app_type")
         val appType: Int,
-        @SerializedName("appid")
+        @SerialName("appid")
         val appid: Int,
-        @SerializedName("desc")
+        @SerialName("desc")
         val desc: String,
-        @SerializedName("jumpUrl")
+        @SerialName("jumpUrl")
         val jumpUrl: String,
-        @SerializedName("musicUrl")
+        @SerialName("musicUrl")
         val musicUrl: String,
-        @SerializedName("preview")
+        @SerialName("preview")
         val preview: String,
-        @SerializedName("source_icon")
+        @SerialName("source_icon")
         val sourceIcon: String,
-        @SerializedName("sourceMsgId")
+        @SerialName("sourceMsgId")
         val sourceMsgId: String,
-        @SerializedName("source_url")
+        @SerialName("source_url")
         val sourceUrl: String,
-        @SerializedName("tag")
+        @SerialName("tag")
         val tag: String,
-        @SerializedName("title")
+        @SerialName("title")
         val title: String
     )
 }

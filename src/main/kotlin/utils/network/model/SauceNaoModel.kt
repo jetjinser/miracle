@@ -1,33 +1,39 @@
 package utils.network.model
-import com.google.gson.annotations.SerializedName
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class SauceNaoModel(
-    @SerializedName("results")
+    @SerialName("results")
     val results: List<Result>
 ) {
+    @Serializable
     data class Result(
-        @SerializedName("data")
+        @SerialName("data")
         val `data`: Data,
-        @SerializedName("header")
+        @SerialName("header")
         val header: Header
     )
 
+    @Serializable
     data class Data(
-        @SerializedName("ext_urls")
+        @SerialName("ext_urls")
         val extUrls: List<String>,
-        @SerializedName("member_id")
+        @SerialName("member_id")
         val memberId: Int,
-        @SerializedName("member_name")
+        @SerialName("member_name")
         val memberName: String,
-        @SerializedName("pixiv_id")
+        @SerialName("pixiv_id")
         val pixivId: Int,
-        @SerializedName("title")
+        @SerialName("title")
         val title: String
     )
 
+    @Serializable
     data class Header(
-        @SerializedName("similarity")
+        @SerialName("similarity")
         val similarity: String
     )
 }

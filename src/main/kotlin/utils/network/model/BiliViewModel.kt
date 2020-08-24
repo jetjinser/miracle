@@ -1,38 +1,45 @@
 package utils.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class BiliViewModel(
-    @SerializedName("data")
+    @SerialName("data")
     val `data`: Data,
-    @SerializedName("code")
+    @SerialName("code")
     val code: Int
 ) {
+    @Serializable
     data class Data(
-        @SerializedName("pic")
+        @SerialName("pic")
         val pic: String,
-        @SerializedName("title")
+        @SerialName("title")
         val title: String,
-        @SerializedName("desc")
+        @SerialName("desc")
         val desc: String,
-        @SerializedName("owner")
+        @SerialName("owner")
         val owner: Owner,
-        @SerializedName("stat")
+        @SerialName("stat")
         val stat: Stat
     )
+
+    @Serializable
     data class Owner(
-        @SerializedName("name")
+        @SerialName("name")
         val name: String
     )
+
+    @Serializable
     data class Stat(
-        @SerializedName("view")
+        @SerialName("view")
         val view: Int,
-        @SerializedName("like")
+        @SerialName("like")
         val like: Int,
-        @SerializedName("share")
+        @SerialName("share")
         val share: Int,
-        @SerializedName("coin")
+        @SerialName("coin")
         val coin: Int
     )
 }

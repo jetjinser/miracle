@@ -1,42 +1,45 @@
 package utils.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class TraceMoeModel(
-    @SerializedName("docs")
+    @SerialName("docs")
     val docs: List<Doc>,
-    @SerializedName("limit")
+    @SerialName("limit")
     val limit: Int,
-    @SerializedName("limit_ttl")
+    @SerialName("limit_ttl")
     val limitTtl: Int,
-    @SerializedName("quota")
+    @SerialName("quota")
     val quota: Int,
-    @SerializedName("quota_ttl")
+    @SerialName("quota_ttl")
     val quotaTtl: Int
 ) {
+    @Serializable
     data class Doc(
-        @SerializedName("at")
+        @SerialName("at")
         val at: Double,
-        @SerializedName("from")
+        @SerialName("from")
         val from: Double,
-        @SerializedName("to")
+        @SerialName("to")
         val to: Double,
-        @SerializedName("is_adult")
+        @SerialName("is_adult")
         val isAdult: Boolean,
-        @SerializedName("anilist_id")
+        @SerialName("anilist_id")
         val aniListId: Int,
-        @SerializedName("mal_id")
+        @SerialName("mal_id")
         val malId: Int,
-        @SerializedName("season")
+        @SerialName("season")
         val season: String,
-        @SerializedName("similarity")
+        @SerialName("similarity")
         val similarity: Double,
-        @SerializedName("title")
+        @SerialName("title")
         val title: String,
-        @SerializedName("title_chinese")
+        @SerialName("title_chinese")
         val titleChinese: String,
-        @SerializedName("tokenthumb")
+        @SerialName("tokenthumb")
         val tokenThumb: String
     )
 }

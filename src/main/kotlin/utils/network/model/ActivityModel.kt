@@ -1,21 +1,23 @@
 package utils.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class ActivityModel(
-    @SerializedName("accessibility")
+    @SerialName("accessibility")
     val accessibility: Double,
-    @SerializedName("activity")
+    @SerialName("activity")
     val activity: String,
-    @SerializedName("key")
+    @SerialName("key")
     val key: String,
-    @SerializedName("link")
+    @SerialName("link")
     val link: String,
-    @SerializedName("participants")
+    @SerialName("participants")
     val participants: Int,
-    @SerializedName("price")
+    @SerialName("price")
     val price: Double,
-    @SerializedName("type")
+    @SerialName("type")
     val type: String
 )

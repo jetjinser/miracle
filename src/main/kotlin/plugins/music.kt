@@ -7,7 +7,10 @@ import utils.process.music.MusicProvider
 fun Bot.music() {
     subscribeGroupMessages {
         startsWith("点歌", removePrefix = true, trim = true) {
-            MusicProvider.netEaseMusicGen(it).send()
+            val netEaseMusicLightApp = MusicProvider.netEaseMusicGen(it)
+            if (netEaseMusicLightApp == null) {
+                reply("失败")
+            } else netEaseMusicLightApp.send()
         }
     }
 }

@@ -1,42 +1,45 @@
 package utils.network.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-import com.google.gson.annotations.SerializedName
 
+@Serializable
 data class LoliconSeTuModel(
-    @SerializedName("code")
+    @SerialName("code")
     val code: Int,
-    @SerializedName("count")
+    @SerialName("count")
     val count: Int,
-    @SerializedName("data")
+    @SerialName("data")
     val `data`: List<Data>,
-    @SerializedName("msg")
+    @SerialName("msg")
     val msg: String,
-    @SerializedName("quota")
+    @SerialName("quota")
     val quota: Int,
-    @SerializedName("quota_min_ttl")
+    @SerialName("quota_min_ttl")
     val quotaMinTtl: Int
 ) {
+    @Serializable
     data class Data(
-        @SerializedName("author")
+        @SerialName("author")
         val author: String,
-        @SerializedName("height")
+        @SerialName("height")
         val height: Int,
-        @SerializedName("p")
+        @SerialName("p")
         val p: Int,
-        @SerializedName("pid")
+        @SerialName("pid")
         val pid: Int,
-        @SerializedName("r18")
+        @SerialName("r18")
         val r18: Boolean,
-        @SerializedName("tags")
+        @SerialName("tags")
         val tags: List<String>,
-        @SerializedName("title")
+        @SerialName("title")
         val title: String,
-        @SerializedName("uid")
+        @SerialName("uid")
         val uid: Int,
-        @SerializedName("url")
+        @SerialName("url")
         val url: String,
-        @SerializedName("width")
+        @SerialName("width")
         val width: Int
     )
 }

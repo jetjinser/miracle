@@ -1,34 +1,41 @@
 package utils.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class NetEaseMusicApiModel(
-    @SerializedName("result")
+    @SerialName("result")
     val result: Result
 ) {
+    @Serializable
     data class Result(
-        @SerializedName("songs")
+        @SerialName("songs")
         val songs: List<Song>
     )
 
+    @Serializable
     data class Song(
-        @SerializedName("al")
+        @SerialName("al")
         val al: Al,
-        @SerializedName("ar")
+        @SerialName("ar")
         val ar: List<Ar>,
-        @SerializedName("id")
+        @SerialName("id")
         val id: Int,
-        @SerializedName("name")
+        @SerialName("name")
         val name: String
     )
 
+    @Serializable
     data class Al(
-        @SerializedName("picUrl")
+        @SerialName("picUrl")
         val picUrl: String
     )
 
+    @Serializable
     data class Ar(
-        @SerializedName("name")
+        @SerialName("name")
         val name: String
     )
 }

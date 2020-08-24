@@ -6,12 +6,8 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object NetEaseFormData {
-    const val encSecKey = """
-96082b986b9f636e80c4de5868d9798cd4f5008d09d19c39c21817d36b3df39719a9c6d367
-e249eedba216ce536e839265edc6e1cc5486db3f9545e5c560f329476cf9bb962a3ef63c4a
-e48c08df1aac1244f056aa1a356becc10bd475bd95b80442d17515070f50b7730d43c9db00
-a151a0d530786d336767df354ab9189e50
-    """
+    const val encSecKey =
+        """96082b986b9f636e80c4de5868d9798cd4f5008d09d19c39c21817d36b3df39719a9c6d367e249eedba216ce536e839265edc6e1cc5486db3f9545e5c560f329476cf9bb962a3ef63c4ae48c08df1aac1244f056aa1a356becc10bd475bd95b80442d17515070f50b7730d43c9db00a151a0d530786d336767df354ab9189e50"""
 
     fun encrypt(value: String): String {
         val fir = enc(value, "0CoJUm6Qyw8W8jud")

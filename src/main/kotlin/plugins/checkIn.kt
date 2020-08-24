@@ -1,6 +1,5 @@
 package plugins
 
-import SecretConfig.owner
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.buildMessageChain
