@@ -1,6 +1,8 @@
 package plugins
 
 import io.ktor.client.request.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.LightApp
@@ -13,7 +15,14 @@ fun Bot.antiLightApp() {
     subscribeGroupMessages {
         has<LightApp> {
             val client = KtorClient.getInstance() ?: return@has
-            val model = client.get<AntiLightAppModel>(it.content)
+            val model: AntiLightAppModel
+            try {
+                model = Json { ignoreUnknownKeys = true }.decodeFromString(it.content)
+            } catch (e: Exception) {
+                logger.info("JsonDecodingException 网 易 云")
+                return@has
+            }
+
 
             var url = model.meta.detail.preview
             "https://".let { scheme ->
