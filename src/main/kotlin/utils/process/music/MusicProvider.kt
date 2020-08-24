@@ -22,8 +22,6 @@ object MusicProvider {
         val url =
             """https://music.163.com/weapi/cloudsearch/get/web?csrf_token=&params=${params}&encSecKey=${NetEaseFormData.encSecKey}"""
 
-        println(url)
-
         val client = KtorClient.getInstance() ?: return null
 
         val model = client.post<NetEaseMusicApiModel>(url)
