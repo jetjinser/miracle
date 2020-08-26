@@ -19,6 +19,8 @@ data class TraceMoeModel(
 ) {
     @Serializable
     data class Doc(
+        @SerialName("episode")
+        val episode: String,
         @SerialName("at")
         val at: Double,
         @SerialName("from")
@@ -29,10 +31,6 @@ data class TraceMoeModel(
         val isAdult: Boolean,
         @SerialName("anilist_id")
         val aniListId: Int,
-        @SerialName("mal_id")
-        val malId: Int,
-        @SerialName("season")
-        val season: String,
         @SerialName("similarity")
         val similarity: Double,
         @SerialName("title")

@@ -17,7 +17,7 @@ fun Bot.antiLightApp() {
             val client = KtorClient.getInstance() ?: return@has
             val model: AntiLightAppModel
             try {
-                model = Json { ignoreUnknownKeys = true }.decodeFromString(it.content)
+                model = KtorClient.json.decodeFromString(it.content)
             } catch (e: Exception) {
                 logger.info("JsonDecodingException 网 易 云")
                 return@has
@@ -42,6 +42,8 @@ fun Bot.antiLightApp() {
                 add(byteArray.inputStream().uploadAsImage())
                 add("${detail.desc}\n${doCurl ?: "无法获取链接: ${detail.title}不支持或版本过低"}\nvia antiLightApp")
             }.send()
+
+            intercept()
         }
     }
 }

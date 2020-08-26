@@ -3,6 +3,7 @@ package utils.network
 import io.ktor.client.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+import kotlinx.serialization.json.Json
 import utils.logger.BotLogger
 
 
@@ -19,6 +20,7 @@ object KtorClient {
                         install(JsonFeature) {
                             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
                                 ignoreUnknownKeys = true
+                                isLenient = true
                             })
                         }
                     }
@@ -27,4 +29,6 @@ object KtorClient {
         }
         return singleton
     }
+
+    val json: Json by lazy { Json { ignoreUnknownKeys = true; isLenient = true } }
 }

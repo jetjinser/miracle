@@ -19,7 +19,10 @@ import utils.data.MessageCacheData.messageCache
 import utils.network.KtorClient
 import utils.network.model.LoliconSeTuModel
 import utils.network.model.SauceNaoModel
+import utils.network.model.TraceMoeInfoModel
+import utils.network.model.TraceMoeModel
 import java.io.InputStream
+import java.text.DecimalFormat
 
 fun Bot.seTu() {
     suspend fun GroupMessageEvent.getSeTu() {
@@ -27,6 +30,7 @@ fun Bot.seTu() {
 
         val client = KtorClient.getInstance() ?: return
 
+        // TODO 缓存
         val url = "https://api.lolicon.app/setu/?r18=0&apikey=$loliconSeTuApiKey"
         val response = client.get<HttpResponse>(url)
 
@@ -54,7 +58,7 @@ fun Bot.seTu() {
         }
     }
 
-    suspend fun GroupMessageEvent.searchImage(imageUrl: String) {
+    suspend fun GroupMessageEvent.searchSeTu(imageUrl: String) {
         reply("少女祈祷中")
         val url =
             "https://saucenao.com/search.php?output_type=2&api_key=$sauceNaoApiKey&numres=1&url=$imageUrl"
@@ -94,8 +98,49 @@ fun Bot.seTu() {
         }.send()
     }
 
+    suspend fun GroupMessageEvent.searchAnimation(imageUrl: String) {
+        reply("少女祈祷中")
+        val client = KtorClient.getInstance() ?: return
+
+        val url = "https://trace.moe/api/search?url=$imageUrl"
+        val response = client.get<HttpResponse>(url)
+
+        val searchModel = KtorClient.json.decodeFromString<TraceMoeModel>(response.readText())
+
+        if (response.status.value == 429) {
+            logger.info("达到请求上限: ${searchModel.limitTtl}s 后恢复")
+            reply(
+                "达到请求上限, 距离下一次调用额度恢复还有 ${searchModel.limit}s, 恢复后有10次请求额度\n" +
+                        "总共还有 ${searchModel.quota} 次调用额度, ${searchModel.quotaTtl}s 后恢复"
+            )
+            return
+        }
+
+        val doc = searchModel.docs.first()
+
+        val infoUrl = "https://trace.moe/info?anilist_id=${doc.aniListId}"
+        val infoModel = client.get<List<TraceMoeInfoModel>>(infoUrl).first()
+
+        val descWithHtml = infoModel.description
+        val desc = Regex("<[^>]+>").replace(descWithHtml, "").substring(0..144)
+
+        buildMessageChain {
+            if (!doc.isAdult) {
+                val imageStream = client.get<ByteArray>(infoModel.coverImage.large)
+                add(imageStream.inputStream().uploadAsImage())
+            } else add("成人向, 不显示图片\n")
+
+            add("${doc.title} / ${doc.titleChinese} #${doc.episode}\n")
+            add("相似度: ${DecimalFormat("#.00").format(doc.similarity * 100) + "%"}\n")
+            add("$desc...")
+            add("\nhttps://anilist.co/anime/${doc.aniListId}\n")
+            add("via TraceMoe")
+        }.send()
+
+    }
+
     subscribeGroupMessages {
-        Regex("(?:来一?[点张份]?)?[色瑟涩]图来?") matching { getSeTu() }
+        Regex("(?:来一?[点张份]?)?[色瑟涩]图来?") matching { getSeTu(); intercept() }
 
         Regex("""\s*[pP][识搜]图\s*""") matching {
             reply("请发送你要搜索的二次元图片")
@@ -103,8 +148,9 @@ fun Bot.seTu() {
                 message[Image] != null
             }
             messageChain[Image]?.queryUrl()?.let {
-                this.searchImage(it)
+                this.searchSeTu(it)
             }
+            intercept()
         }
 
         has<QuoteReply> { reply ->
@@ -113,21 +159,37 @@ fun Bot.seTu() {
                 val messageChain = msg?.parseMiraiCode()
                 val image = messageChain?.get(Image)?.queryUrl()
                 if (image != null) {
-                    val cuprum = CheckInData(this).consumeCuprum(100)
-                    if (cuprum != null) {
-                        this.searchImage(image)
+                    val pair = CheckInData(this).consumeCuprum(100)
+                    if (pair.first) {
+                        this.searchSeTu(image)
                     } else {
-                        reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: $cuprum")
+                        reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
                     }
                 } else {
                     reply("无法获取到图片, 请直接使用指令 [p识图]")
                 }
+            } else if (Regex(""".*动[画漫][识搜]图\s*""").matches(message.content)) {
+                val msg = messageCache?.get(reply.source.id)
+                val messageChain = msg?.parseMiraiCode()
+                val image = messageChain?.get(Image)?.queryUrl()
+                if (image != null) {
+                    val pair = CheckInData(this).consumeCuprum(100)
+                    if (pair.first) {
+                        this.searchAnimation(image)
+                    } else {
+                        reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+                    }
+                } else {
+                    reply("无法获取到图片, 请直接使用指令 [动画识图]")
+                }
             }
+            intercept()
         }
 
         val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
         has<Image> {
             if (message[Image]?.imageId == seTuCome) getSeTu()
+            intercept()
         }
 
         Regex("""\s*动[画漫][识搜]图\s*""") matching {
@@ -136,8 +198,9 @@ fun Bot.seTu() {
                 message[Image] != null
             }
             messageChain[Image]?.queryUrl()?.let {
-                println(it)
+                searchAnimation(it)
             }
+            intercept()
         }
     }
 }

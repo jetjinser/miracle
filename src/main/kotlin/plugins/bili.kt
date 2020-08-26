@@ -36,6 +36,8 @@ fun Bot.bili() {
 
             logger.info("提取到图片url: ${model.data.pic}")
             client.get<ByteArray>(model.data.pic).inputStream().sendAsImage()
+
+            intercept()
         }
 
         Regex(""".*(?i)((av\d{5,13})|(BV\w{10}\??))(?-i).*""") matching regex@{
@@ -70,6 +72,7 @@ fun Bot.bili() {
                     logger.info("视频不存在")
                 }
             }
+            intercept()
         }
 
         Regex(""".*(?i)cv(?-i)\d{5,7}.*""") matching regex@{ msg ->
@@ -88,6 +91,7 @@ fun Bot.bili() {
                         "   ⓒ ${stats.coin}  ⮬ ${stats.share}\n$biliUrl\nvia antiCv"
             )
 
+            intercept()
         }
 
         Regex("""\s*新番(时间表)?\s*""") matching {

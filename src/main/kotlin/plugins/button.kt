@@ -20,12 +20,14 @@ fun Bot.button() {
             inputStream.use { inp ->
                 group.uploadVoice(inp).send()
             }
+            intercept()
         }
         Regex("""\s*(?:咩(?:叫|按钮))|(?:mea +button)\s*""") matching {
             val inputStream = meaFileList.random().inputStream()
             inputStream.use { inp ->
                 group.uploadVoice(inp).send()
             }
+            intercept()
         }
     }
 }

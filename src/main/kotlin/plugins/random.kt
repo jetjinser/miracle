@@ -11,6 +11,7 @@ fun Bot.random() {
     subscribeGroupMessages {
         startsWith("随机数", removePrefix = true, trim = true) {
             reply(randomNumber(message.content))
+            intercept()
         }
 
         startsWith("打乱", removePrefix = true, trim = true) {
@@ -20,6 +21,7 @@ fun Bot.random() {
                     .filter { it.isNotEmpty() }
                     .shuffled().joinToString(" ")
             )
+            intercept()
         }
 
         startsWith("抽签") {
@@ -30,6 +32,7 @@ fun Bot.random() {
                     .drop(1)
                     .random()
             )
+            intercept()
         }
 
         Regex("找点乐子|没事找事|找点事做") matching regex@{
@@ -43,6 +46,7 @@ fun Bot.random() {
                         "类型:\t${model.type}\n参与人数:\t${model.participants}\n花费:\t${model.price}" +
                         if (model.link.isNotEmpty()) "\n${model.link}" else ""
             )
+            intercept()
         }
     }
 }

@@ -26,6 +26,7 @@ fun Bot.checkIn() {
                     reply("您今天已经签到过了")
                 }
             }
+            intercept()
         }
 
         startsWith("提交", removePrefix = true, trim = true) {
@@ -48,6 +49,7 @@ fun Bot.checkIn() {
             val success = TipsData.add(tip, sender.id)
             val msg = if (success) "提交成功:\n$it" else "提交失败, tip已存在"
             reply(msg)
+            intercept()
         }
 
         case("历史提交", trim = true) {
@@ -61,6 +63,7 @@ fun Bot.checkIn() {
                     add("via checkInTips")
                 }.send()
             } else reply("你还没有提交过tip")
+            intercept()
         }
 
         case("正在审核", trim = true) {
@@ -74,6 +77,7 @@ fun Bot.checkIn() {
                     add("via checkInTip")
                 }.send()
             } else reply("现在没有正在审核的tip")
+            intercept()
         }
     }
 
@@ -94,6 +98,7 @@ fun Bot.checkIn() {
                     TipsData.review(id, false)
                 }
             } else reply("暂时没有更多了")
+            intercept()
         }
     }
 }

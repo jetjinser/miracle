@@ -28,6 +28,8 @@ suspend fun main() {
         thesaurus()
         setting()
         music()
+        information()
+        tuling()
     }
 
     bot.join()
