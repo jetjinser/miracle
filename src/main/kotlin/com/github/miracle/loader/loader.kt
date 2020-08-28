@@ -32,6 +32,7 @@ suspend fun main() {
         tuling()
         remind()
         scheduler()
+        woPay()
     }
 
     bot.join()
