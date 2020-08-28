@@ -4,7 +4,7 @@
 /.idea/
 /src/test/
 /device.json
-/src/main/kotlin/SecretConfig.kt
+/src/main/kotlin/com/github/miracle/SecretConfig.kt
 /data.db
 /src/main/resources/data.db
 /src/main/resources/button
