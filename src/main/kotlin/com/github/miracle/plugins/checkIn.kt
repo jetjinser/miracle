@@ -8,9 +8,9 @@ import net.mamoe.mirai.message.nextMessage
 import net.mamoe.mirai.utils.minutesToMillis
 import sun.font.FontDesignMetrics
 import com.github.miracle.utils.data.TipsData
-import com.github.miracle.utils.process.checkIn.CheckInModel
-import com.github.miracle.utils.process.checkIn.CheckInPicture
-import com.github.miracle.utils.process.checkIn.CheckInPicture.BackgroundImageType
+import com.github.miracle.utils.tools.checkIn.CheckInModel
+import com.github.miracle.utils.tools.checkIn.CheckInPicture
+import com.github.miracle.utils.tools.checkIn.CheckInPicture.BackgroundImageType
 import com.github.miracle.utils.subscriber.subscribeOwnerMessage
 import net.mamoe.mirai.message.data.Image
 import java.awt.Font

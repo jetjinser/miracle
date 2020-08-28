@@ -1,4 +1,4 @@
-package com.github.miracle.utils.process.music
+package com.github.miracle.utils.tools.music
 
 import java.util.*
 import javax.crypto.Cipher

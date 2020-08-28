@@ -2,7 +2,7 @@ package com.github.miracle.plugins
 
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
-import com.github.miracle.utils.process.music.MusicProvider
+import com.github.miracle.utils.tools.music.MusicProvider
 
 fun Bot.music() {
     subscribeGroupMessages {

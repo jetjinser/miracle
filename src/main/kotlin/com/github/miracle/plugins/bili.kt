@@ -10,7 +10,7 @@ import net.mamoe.mirai.utils.minutesToMillis
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.BiliCvModel
 import com.github.miracle.utils.network.model.BiliViewModel
-import com.github.miracle.utils.process.bili.AvBv
+import com.github.miracle.utils.tools.bili.AvBv
 
 fun Bot.bili() {
     subscribeGroupMessages {

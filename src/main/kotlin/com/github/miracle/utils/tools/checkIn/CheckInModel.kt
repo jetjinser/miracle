@@ -1,4 +1,4 @@
-package com.github.miracle.utils.process.checkIn
+package com.github.miracle.utils.tools.checkIn
 
 import net.mamoe.mirai.message.GroupMessageEvent
 import com.github.miracle.utils.data.CheckInData

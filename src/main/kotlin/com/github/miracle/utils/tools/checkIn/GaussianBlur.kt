@@ -1,4 +1,4 @@
-package com.github.miracle.utils.process.checkIn
+package com.github.miracle.utils.tools.checkIn
 
 import java.awt.AWTException
 import java.awt.Image

@@ -1,4 +1,4 @@
-package com.github.miracle.utils.process.bili
+package com.github.miracle.utils.tools.bili
 
 import org.bouncycastle.pqc.math.linearalgebra.IntegerFunctions
 
