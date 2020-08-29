@@ -11,7 +11,7 @@ fun Bot.music() {
             if (netEaseMusicLightApp == null) {
                 reply("失败")
             } else netEaseMusicLightApp.send()
-            intercept()
+             
         }
     }
 }

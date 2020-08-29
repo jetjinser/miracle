@@ -29,7 +29,7 @@ fun Bot.thesaurus() {
                 } else {
                     reply("添加失败, 已存在相同的问答\nⓆ: [$question]\nⒶ: [$answer]\nvia thesaurus")
                 }
-                intercept()
+                 
             }
         }
 

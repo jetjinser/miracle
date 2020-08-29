@@ -1,8 +1,8 @@
 package com.github.miracle.utils.tools.checkIn
 
-import net.mamoe.mirai.message.GroupMessageEvent
 import com.github.miracle.utils.data.CheckInData
 import com.github.miracle.utils.data.TipsData
+import net.mamoe.mirai.message.GroupMessageEvent
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -12,7 +12,11 @@ import java.time.format.DateTimeFormatter
  * @author jinser
  */
 class CheckInModel(private val event: GroupMessageEvent) {
-    private val checkInData: CheckInData = CheckInData(event)
+    val checkInData: CheckInData = CheckInData(event)
+
+    fun haveCheckIn(): Boolean {
+        return LocalDate.parse(checkInData.lastCheckInDay, DateTimeFormatter.ISO_DATE) == LocalDate.now()
+    }
 
     val checkInfoArray
         get() = arrayOf(

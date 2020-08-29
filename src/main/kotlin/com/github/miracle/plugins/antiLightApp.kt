@@ -42,7 +42,7 @@ fun Bot.antiLightApp() {
                 add("${detail.desc}\n${doCurl ?: "无法获取链接: ${detail.title}不支持或版本过低"}\nvia antiLightApp")
             }.send()
 
-            intercept()
+             
         }
     }
 }

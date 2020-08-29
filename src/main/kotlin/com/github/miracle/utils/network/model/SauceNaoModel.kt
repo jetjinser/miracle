@@ -22,13 +22,13 @@ data class SauceNaoModel(
         @SerialName("ext_urls")
         val extUrls: List<String>,
         @SerialName("member_id")
-        val memberId: Int,
+        val memberId: Int = -1,
         @SerialName("member_name")
-        val memberName: String,
+        val memberName: String = "未知",
         @SerialName("pixiv_id")
-        val pixivId: Int,
+        val pixivId: Int = -1,
         @SerialName("title")
-        val title: String
+        val title: String = "未知"
     )
 
     @Serializable

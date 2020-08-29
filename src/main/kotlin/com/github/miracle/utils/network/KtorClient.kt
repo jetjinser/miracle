@@ -9,7 +9,7 @@ import com.github.miracle.utils.logger.BotLogger
 
 object KtorClient {
     private var singleton: HttpClient? = null
-    private val logger = BotLogger.logger("OkHttpUtil")
+    private val logger = BotLogger.logger("KCI")
 
     fun getInstance(): HttpClient? {
         if (singleton == null) {

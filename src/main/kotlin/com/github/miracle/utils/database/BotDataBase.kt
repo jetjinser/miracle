@@ -63,4 +63,16 @@ object BotDataBase {
         val groupId = long("group_id")
         val qaProbability = double("qa_probability")
     }
+
+    // woPay region
+    object Deadline : Table<Nothing>("Deadline") {
+        val deadline = varchar("deadline").primaryKey()
+        val groupId = long("group_id")
+    }
+
+    object Token : Table<Nothing>("Token") {
+        val token = varchar("token").primaryKey()
+        val day = int("day")
+    }
+    // end region
 }

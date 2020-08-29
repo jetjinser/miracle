@@ -1,18 +1,19 @@
 package com.github.miracle.plugins
 
+import com.github.miracle.utils.data.TipsData
+import com.github.miracle.utils.subscriber.subscribeOwnerMessage
+import com.github.miracle.utils.tools.checkIn.CheckInModel
+import com.github.miracle.utils.tools.checkIn.CheckInPicture
+import com.github.miracle.utils.tools.checkIn.CheckInPicture.BackgroundImageType
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.nextMessage
 import net.mamoe.mirai.utils.minutesToMillis
 import sun.font.FontDesignMetrics
-import com.github.miracle.utils.data.TipsData
-import com.github.miracle.utils.tools.checkIn.CheckInModel
-import com.github.miracle.utils.tools.checkIn.CheckInPicture
-import com.github.miracle.utils.tools.checkIn.CheckInPicture.BackgroundImageType
-import com.github.miracle.utils.subscriber.subscribeOwnerMessage
-import net.mamoe.mirai.message.data.Image
 import java.awt.Font
 
 
@@ -27,8 +28,21 @@ fun Bot.checkIn() {
                     reply("您今天已经签到过了")
                 }
             }
-            intercept()
         }
+
+        case("查询", trim = true) {
+            val model = CheckInModel(this)
+            val data = model.checkInData
+            val symbol = if (model.haveCheckIn()) "已签到 √" else "未签到 ×"
+            buildMessageChain {
+                add(sender.nameCardOrNick)
+                add("\nCuprum ${data.cuprum}    今日$symbol\n")
+                add("签到天数  ${data.checkInDays}    好感度  ${data.favor}\n")
+                add("via checkIn")
+            }.send()
+        }
+
+        // ----
 
         startsWith("提交", removePrefix = true, trim = true) {
             if (message[Image] != null) {
@@ -54,7 +68,6 @@ fun Bot.checkIn() {
             val success = TipsData.add(tip, sender.id)
             val msg = if (success) "提交成功:\n$it" else "提交失败, tip已存在"
             reply(msg)
-            intercept()
         }
 
         case("历史提交", trim = true) {
@@ -68,7 +81,6 @@ fun Bot.checkIn() {
                     add("via checkInTips")
                 }.send()
             } else reply("你还没有提交过tip")
-            intercept()
         }
 
         case("正在审核", trim = true) {
@@ -82,7 +94,7 @@ fun Bot.checkIn() {
                     add("via checkInTip")
                 }.send()
             } else reply("现在没有正在审核的tip")
-            intercept()
+             
         }
     }
 
@@ -103,7 +115,6 @@ fun Bot.checkIn() {
                     TipsData.review(id, false)
                 }
             } else reply("暂时没有更多了")
-            intercept()
         }
     }
 }
