@@ -33,6 +33,7 @@ suspend fun main() {
         remind()
         scheduler()
         woPay()
+        help()
     }
 
     bot.join()

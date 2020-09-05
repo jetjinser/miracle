@@ -4,6 +4,7 @@ import com.github.miracle.utils.tools.RemindDate
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.PlainText
 import java.util.*
 import kotlin.concurrent.schedule
@@ -34,7 +35,9 @@ fun Bot.remind() {
 
             reply("好的, 我会在 $preDate 提醒你\n[$something]")
             timer.schedule(delay) {
-                launch { reply(something) }
+                launch {
+                    reply(At(sender) + something)
+                }
             }
         }
     }

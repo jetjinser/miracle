@@ -38,20 +38,6 @@ fun Bot.random() {
             )
              
         }
-
-        Regex("找点乐子|没事找事|找点事做") matching regex@{
-            val client = KtorClient.getInstance() ?: return@regex
-
-            val url = "http://www.boredapi.com/api/activity/"
-            val model = client.get<ActivityModel>(url)
-
-            reply(
-                "你可以\n\t${model.activity}\n可行性:\t${model.accessibility}\n" +
-                        "类型:\t${model.type}\n参与人数:\t${model.participants}\n花费:\t${model.price}" +
-                        if (model.link.isNotEmpty()) "\n${model.link}" else ""
-            )
-             
-        }
     }
 }
 

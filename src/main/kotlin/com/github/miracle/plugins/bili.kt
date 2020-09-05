@@ -11,8 +11,47 @@ import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.BiliCvModel
 import com.github.miracle.utils.network.model.BiliViewModel
 import com.github.miracle.utils.tools.bili.AvBv
+import io.ktor.client.statement.*
+import io.ktor.http.cio.*
+import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.message.uploadAsImage
 
 fun Bot.bili() {
+    suspend fun MessageEvent.biliView(message: String) {
+        val avOrBv =
+            Regex(""".*(?i)((?<av>av\d{5,13})|(?<bv>BV\w{10}))(?-i).*""").matchEntire(message)?.groupValues?.get(1)
+        val aid = avOrBv?.drop(2)?.toIntOrNull() ?: avOrBv?.let { bv -> AvBv.bvToAv(bv)?.toInt() }
+        if (aid != null) {
+            val url = "https://api.bilibili.com/x/web-interface/view?aid=$aid"
+
+            logger.info("Request $url")
+
+            val client = KtorClient.getInstance() ?: return
+
+            val model = client.get<BiliViewModel>(url)
+            if (model.code == 0) {
+                val biliUrl = "https://www.bilibili.com/video/$avOrBv"
+
+                val data = model.data
+                val stat = data.stat
+                val imageStream = client.get<ByteArray>(model.data.pic).inputStream()
+
+                buildMessageChain {
+                    add(imageStream.uploadAsImage())
+                    add(
+                        "${data.title} / ${data.owner.name}\n${data.desc}\n$biliUrl\n"
+                    )
+                    add(
+                        "⌘ ${stat.view} 👍 ${stat.like} ⓒ ${stat.coin} ⮬ ${stat.share}\n"
+                    )
+                    add("via antiBv")
+                }.send()
+            } else logger.info("视频不存在")
+        }
+    }
+
     subscribeGroupMessages {
         startsWith("提取封面", removePrefix = true, trim = true) { m ->
             var aid = m.toIntOrNull() ?: AvBv.bvToAv(m)?.toInt()
@@ -37,42 +76,11 @@ fun Bot.bili() {
             logger.info("提取到图片url: ${model.data.pic}")
             client.get<ByteArray>(model.data.pic).inputStream().sendAsImage()
 
-             
+
         }
 
         Regex(""".*(?i)((av\d{5,13})|(BV\w{10}\??))(?-i).*""") matching regex@{
-            val avOrBv =
-                Regex(""".*(?i)((?<av>av\d{5,13})|(?<bv>BV\w{10}))(?-i).*""").matchEntire(it)?.groupValues?.get(1)
-            val aid = avOrBv?.drop(2)?.toIntOrNull() ?: avOrBv?.let { bv -> AvBv.bvToAv(bv)?.toInt() }
-            if (aid != null) {
-                val url = "https://api.bilibili.com/x/web-interface/view?aid=$aid"
-                logger.info("Request $url")
-
-                val client = KtorClient.getInstance() ?: return@regex
-
-                val model = client.get<BiliViewModel>(url)
-                if (model.code == 0) {
-                    val data = model.data
-                    val stat = data.stat
-                    val biliUrl = "https://www.bilibili.com/video/$it"
-                    val imageStream = client.get<ByteArray>(model.data.pic).inputStream()
-
-                    buildMessageChain {
-                        add(imageStream.uploadAsImage())
-                        add(
-                            "${data.title} / ${data.owner.name}\n${data.desc}\n$biliUrl\n"
-                        )
-                        add(
-                            "⌘ ${stat.view} 👍 ${stat.like} ⓒ ${stat.coin} ⮬ ${stat.share}\n"
-                        )
-                        add("via antiBv")
-                    }.send()
-
-                } else {
-                    logger.info("视频不存在")
-                }
-            }
-             
+            biliView(it)
         }
 
         Regex(""".*(?i)cv(?-i)\d{5,7}.*""") matching regex@{ msg ->
@@ -90,12 +98,23 @@ fun Bot.bili() {
                 "${data.title}\n✍ ${data.authorName}\n👍 ${stats.like}  \uD83D\uDC4E ${stats.dislike}" +
                         "   ⓒ ${stats.coin}  ⮬ ${stats.share}\n$biliUrl\nvia antiCv"
             )
-
-             
         }
 
-        Regex("""\s*新番(时间表)?\s*""") matching {
-            // TODO 新番 / 新番时间表
+        Regex(""".*b23\.tv/.*""") matching regex@{
+            val result = Regex(""".*(https://b23\.tv/\w{6}).*""").matchEntire(it) ?: return@regex
+            val b23Url = result.groupValues.getOrNull(1) ?: return@regex
+
+            val client = KtorClient.getInstance() ?: return@regex
+            val response = client.head<HttpResponse>(b23Url)
+            val location = response.headers["location"] ?: return@regex
+
+            biliView(location)
+        }
+
+
+        // bilibili 订阅
+        startsWith("b订阅", removePrefix = true, trim = true) {
+
         }
     }
 }
