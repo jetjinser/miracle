@@ -17,19 +17,18 @@ fun Bot.button() {
     val meaFileList = traverseFileTree("button/mea_voices")
 
     subscribeGroupMessages {
-        Regex("""\s*(?:夸(?:叫|按钮))|(?:aqua +button)\s*""") matching  {
+        Regex("""\s*(?:夸(?:叫|按钮))|(?:aqua +button)\s*""") matching {
             val inputStream = aquaFileList.random().inputStream()
             inputStream.use { inp ->
                 group.uploadVoice(inp).send()
             }
-             
         }
+
         Regex("""\s*(?:咩(?:叫|按钮))|(?:mea +button)\s*""") matching {
             val inputStream = meaFileList.random().inputStream()
             inputStream.use { inp ->
                 group.uploadVoice(inp).send()
             }
-             
         }
     }
 }

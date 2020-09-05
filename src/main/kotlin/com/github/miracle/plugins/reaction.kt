@@ -12,33 +12,6 @@ fun Bot.reaction() {
         group.botAsMember.sendMessage("🔈 群公告已改变, 请及时查看\nchange by ${operatorOrBot.nameCardOrNick}")
     }
 
-    subscribeAlways<GroupAllowAnonymousChatEvent> {
-        val opt = if (group.settings.isAnonymousChatEnabled) {
-            "🔈 匿名被开启了"
-        } else {
-            "🔈 匿名被禁止了"
-        }
-        group.sendMessage(opt)
-    }
-
-    subscribeAlways<GroupAllowConfessTalkEvent> {
-        val opt = if (group.settings.isConfessTalkEnabled) {
-            "🔈 坦白说被禁止了"
-        } else {
-            "🔈 坦白说被开启了"
-        }
-        group.sendMessage(opt)
-    }
-
-    subscribeAlways<GroupAllowMemberInviteEvent> {
-        val opt = if (group.settings.isAllowMemberInvite) {
-            "🔈 现在允许群友邀请好友入群了"
-        } else {
-            "🔈 现在群友不能邀请好友入群了"
-        }
-        group.sendMessage(opt)
-    }
-
     subscribeAlways<MemberJoinEvent.Invite> {
         group.sendMessage("欢迎")
     }

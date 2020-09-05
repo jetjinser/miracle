@@ -25,16 +25,20 @@ class CheckInData(private val event: GroupMessageEvent) {
     private var _cuprum: Int? = null
     private var _favor: Int? = null
 
-    fun consumeCuprum(amount: Int): Pair<Boolean, Int?> {
-        val cuprum = this.cuprum
+    suspend fun consumeCuprum(amount: Int, block: suspend (Pair<Boolean, Int?>) -> Boolean = { true }): Pair<Boolean, Int?> {
+        val cuprum = cuprum
         if (cuprum != null) {
             if (cuprum < amount) {
                 logger.info("${event.sender.nameCardOrNick} 当前铜币 $cuprum 枚, 不足消费 $amount")
                 return false to cuprum
             }
-            this.cuprum = cuprum - amount
-            logger.info("${event.sender.nameCardOrNick} 消费 $amount 枚铜币")
-            return true to cuprum
+            if (block(true to cuprum)) {
+                this.cuprum = cuprum - amount
+                logger.info("${event.sender.nameCardOrNick} 消费 $amount 枚铜币")
+                return true to cuprum
+            } else {
+                logger.info("取消")
+            }
         }
         return false to cuprum
     }

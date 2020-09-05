@@ -1,5 +1,6 @@
 package com.github.miracle.plugins
 
+import com.github.miracle.utils.data.CheckInData
 import com.github.miracle.utils.data.TipsData
 import com.github.miracle.utils.subscriber.subscribeOwnerMessage
 import com.github.miracle.utils.tools.checkIn.CheckInModel
@@ -44,20 +45,20 @@ fun Bot.checkIn() {
 
         // ----
 
-        startsWith("提交", removePrefix = true, trim = true) {
+        startsWith("提交", removePrefix = true, trim = true) { s ->
             if (message[Image] != null) {
                 reply("无法提交图片")
                 return@startsWith
             }
             var tipWidth = 0
             val tipsFont = Font("Microsoft JhengHei", Font.BOLD, 20)
-            it.forEach { word -> tipWidth += FontDesignMetrics.getMetrics(tipsFont).charWidth(word) }
+            s.forEach { word -> tipWidth += FontDesignMetrics.getMetrics(tipsFont).charWidth(word) }
             if (tipWidth > 540) {
                 reply("tip 过长, 提交失败")
                 return@startsWith
             }
 
-            var tip = it
+            var tip = s
             if (tip.isEmpty()) {
                 tip = nextMessage(3.minutesToMillis) { message.content.isNotEmpty() }.content
                 if (tip in listOf("算了", "取消", "不要了")) {
@@ -65,9 +66,20 @@ fun Bot.checkIn() {
                     return@startsWith
                 }
             }
-            val success = TipsData.add(tip, sender.id)
-            val msg = if (success) "提交成功:\n$it" else "提交失败, tip已存在"
-            reply(msg)
+
+            val data = CheckInData(this)
+            data.consumeCuprum(20) {
+                if (it.first) {
+                    val success = TipsData.add(tip, sender.id)
+                    if (success) reply("提交成功:\n$s") else {
+                        reply("提交失败, tip已存在")
+                        return@consumeCuprum false
+                    }
+                } else {
+                    reply("铜币不足 20 , 提交取消, 铜币可由签到获得\n当前铜币: ${it.second}")
+                }
+                true
+            }
         }
 
         case("历史提交", trim = true) {

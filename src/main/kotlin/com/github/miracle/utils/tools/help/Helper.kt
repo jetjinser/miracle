@@ -1,6 +1,6 @@
 package com.github.miracle.utils.tools.help
 
-class Helper(private val pluginName: String) {
+class Helper(pluginName: String) {
     private val ePlugin = Plugin.findPlugin(pluginName)
 
     companion object {
@@ -64,6 +64,7 @@ class Helper(private val pluginName: String) {
             |点歌, 暂时只支持网易云
             |可用指令:
             |  - 点歌 <歌名>
+            |       消费 50 铜币 @see CheckIn
         """.trimMargin()
         val random = """[Random]
             |一些关于"随机"的指令
@@ -93,12 +94,13 @@ class Helper(private val pluginName: String) {
             |还没写完
         """.trimMargin()
         val tuling = """[Tuling]
-            |对接图灵对话, 带有 @bot 的消息会与图灵交互
+            |对接图灵对话, @bot 的消息会与图灵交互
         """.trimMargin()
         val thesaurus = """[Thesaurus]
             |自定义词库, 各群独立
             |可用指令:
             |  - 添加问<Q>答<A>
+            |       每次消耗 200 铜币
         """.trimMargin()
         val woPay = """[WoPay]
             |可用指令:

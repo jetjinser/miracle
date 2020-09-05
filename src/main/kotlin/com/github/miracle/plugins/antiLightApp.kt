@@ -18,7 +18,7 @@ fun Bot.antiLightApp() {
             try {
                 model = KtorClient.json.decodeFromString(it.content)
             } catch (e: Exception) {
-                logger.info("JsonDecodingException 网 易 云")
+                logger.info("JsonDecodingException 音乐分享")
                 return@has
             }
 
@@ -41,8 +41,6 @@ fun Bot.antiLightApp() {
                 add(byteArray.inputStream().uploadAsImage())
                 add("${detail.desc}\n${doCurl ?: "无法获取链接: ${detail.title}不支持或版本过低"}\nvia antiLightApp")
             }.send()
-
-             
         }
     }
 }

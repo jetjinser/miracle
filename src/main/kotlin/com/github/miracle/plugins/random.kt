@@ -1,18 +1,12 @@
 package com.github.miracle.plugins
 
-import io.ktor.client.request.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.content
-import com.github.miracle.utils.network.KtorClient
-import com.github.miracle.utils.network.model.ActivityModel
 
 fun Bot.random() {
     subscribeGroupMessages {
-        startsWith("随机数", removePrefix = true, trim = true) {
-            reply(randomNumber(message.content))
-             
-        }
+        startsWith("随机数", removePrefix = true, trim = true) { reply(randomNumber(message.content)) }
 
         startsWith("打乱", removePrefix = true, trim = true) {
             reply(
@@ -21,7 +15,6 @@ fun Bot.random() {
                     .filter { it.isNotEmpty() }
                     .shuffled().joinToString(" ")
             )
-             
         }
 
         startsWith("抽签") {
@@ -36,12 +29,11 @@ fun Bot.random() {
                     .drop(1)
                     .random()
             )
-             
         }
     }
 }
 
-fun randomNumber(message: String): String {
+private fun randomNumber(message: String): String {
     var start = 1
     var end = 100
 

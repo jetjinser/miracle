@@ -28,6 +28,12 @@ import java.text.DecimalFormat
 
 fun Bot.seTu() {
     suspend fun GroupMessageEvent.getSeTu() {
+//        val pair = CheckInData(this).consumeCuprum(100)
+//        if (!pair.first) {
+//            reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+//            return
+//        }
+
         reply("少女祈祷中")
 
         val client = KtorClient.getInstance() ?: return
@@ -66,6 +72,12 @@ fun Bot.seTu() {
     }
 
     suspend fun GroupMessageEvent.searchSeTu(imageUrl: String) {
+        val pair = CheckInData(this).consumeCuprum(100)
+        if (!pair.first) {
+            reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+            return
+        }
+
         reply("少女祈祷中")
         val url =
             "https://saucenao.com/search.php?output_type=2&api_key=$sauceNaoApiKey&numres=1&url=$imageUrl"
@@ -110,11 +122,15 @@ fun Bot.seTu() {
         } catch (e: MissingFieldException) {
             reply("不存在或暂不支持的返回, 后续逐步更新迭代将会解决")
         }
-
-
     }
 
     suspend fun GroupMessageEvent.searchAnimation(imageUrl: String) {
+        val pair = CheckInData(this).consumeCuprum(100)
+        if (!pair.first) {
+            reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+            return
+        }
+
         reply("少女祈祷中")
         val client = KtorClient.getInstance() ?: return
 
@@ -152,11 +168,10 @@ fun Bot.seTu() {
             add("\nhttps://anilist.co/anime/${doc.aniListId}\n")
             add("via TraceMoe")
         }.send()
-
     }
 
     subscribeGroupMessages {
-        Regex("(?:来一?[点张份]?)?[色瑟涩]图来?") matching { getSeTu();   }
+//        Regex("(?:来一?[点张份]?)?[色瑟涩]图来?") matching { getSeTu(); }
 
         Regex("""\s*[pP][识搜]图\s*""") matching {
             reply("请发送你要搜索的二次元图片")
@@ -164,9 +179,8 @@ fun Bot.seTu() {
                 message[Image] != null
             }
             messageChain[Image]?.queryUrl()?.let {
-                this.searchSeTu(it)
+                searchSeTu(it)
             }
-             
         }
 
         has<QuoteReply> { reply ->
@@ -174,38 +188,19 @@ fun Bot.seTu() {
                 val msg = messageCache?.get(reply.source.id)
                 val messageChain = msg?.parseMiraiCode()
                 val image = messageChain?.get(Image)?.queryUrl()
-                if (image != null) {
-                    val pair = CheckInData(this).consumeCuprum(100)
-                    if (pair.first) {
-                        this.searchSeTu(image)
-                    } else {
-                        reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
-                    }
-                } else {
-                    reply("无法获取到图片, 请直接使用指令 [p识图]")
-                }
+                if (image != null) searchSeTu(image) else reply("无法获取到图片, 请直接使用指令 [p识图]")
             } else if (Regex(""".*动[画漫][识搜]图\s*""").matches(message.content)) {
                 val msg = messageCache?.get(reply.source.id)
                 val messageChain = msg?.parseMiraiCode()
                 val image = messageChain?.get(Image)?.queryUrl()
-                if (image != null) {
-                    val pair = CheckInData(this).consumeCuprum(100)
-                    if (pair.first) {
-                        this.searchAnimation(image)
-                    } else {
-                        reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
-                    }
-                } else {
-                    reply("无法获取到图片, 请直接使用指令 [动画识图]")
-                }
+                if (image != null) searchAnimation(image) else reply("无法获取到图片, 请直接使用指令 [动画识图]")
             }
-             
         }
 
         val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
         has<Image> {
+            reply("!警告: 这是实验性功能, 存在未经审查的图片")
             if (message[Image]?.imageId == seTuCome) getSeTu()
-             
         }
 
         Regex("""\s*动[画漫][识搜]图\s*""") matching {
@@ -216,7 +211,6 @@ fun Bot.seTu() {
             messageChain[Image]?.queryUrl()?.let {
                 searchAnimation(it)
             }
-             
         }
     }
 }

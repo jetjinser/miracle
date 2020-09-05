@@ -1,22 +1,18 @@
 package com.github.miracle.plugins
 
-import io.ktor.client.request.*
-import net.mamoe.mirai.Bot
-import net.mamoe.mirai.event.subscribeGroupMessages
-import net.mamoe.mirai.message.data.buildMessageChain
-import net.mamoe.mirai.message.data.content
-import net.mamoe.mirai.message.nextMessage
-import net.mamoe.mirai.utils.minutesToMillis
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.BiliCvModel
 import com.github.miracle.utils.network.model.BiliViewModel
 import com.github.miracle.utils.tools.bili.AvBv
+import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.cio.*
-import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.MessageEvent
-import net.mamoe.mirai.message.uploadAsImage
+import net.mamoe.mirai.message.data.buildMessageChain
+import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.nextMessage
+import net.mamoe.mirai.utils.minutesToMillis
 
 fun Bot.bili() {
     suspend fun MessageEvent.biliView(message: String) {
@@ -113,8 +109,8 @@ fun Bot.bili() {
 
 
         // bilibili 订阅
-        startsWith("b订阅", removePrefix = true, trim = true) {
-
-        }
+//        startsWith("b订阅", removePrefix = true, trim = true) {
+//
+//        }
     }
 }
