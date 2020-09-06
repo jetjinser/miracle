@@ -9,6 +9,11 @@ import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.PlainText
 
 fun Bot.help() {
+    val pluginNameArray = arrayOf(
+        "反小程序", "bilibili", "内置回复", "按钮", "签到",
+        "帮助", "信息", "音乐", "随机", "响应", "提醒", "内置提醒", "设置", "图灵", "词库", "WoPay"
+    )
+
     subscribeGroupMessages(priority = Listener.EventPriority.LOW) {
         Regex(""".*(帮助|菜单|(?i)help).*""") matching regex@{
             if (message[At]?.target != bot.id) return@regex
@@ -19,7 +24,7 @@ fun Bot.help() {
                 // 直接发送 help
                 reply(
                     """我目前的功能有:
-                        |${Plugin.EPlugin.values().joinToString("\n")}
+                        |${pluginNameArray.joinToString("\n")}
                         |可发送 帮助 <功能名> 来查看详情
                         |readme: 待填
                     """.trimMargin()
