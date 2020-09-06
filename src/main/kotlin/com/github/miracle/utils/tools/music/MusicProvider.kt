@@ -24,7 +24,9 @@ object MusicProvider {
 
         val client = KtorClient.getInstance() ?: return null
 
-        val model = client.post<NetEaseMusicApiModel>(url)
+        val model = client.post<NetEaseMusicApiModel>(url) {
+
+        }
 
         val ctime = System.currentTimeMillis() / 1000
         val song = model.result.songs.first()

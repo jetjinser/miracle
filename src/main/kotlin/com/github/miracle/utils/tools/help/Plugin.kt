@@ -5,7 +5,7 @@ object Plugin {
         AntiLightApp(Regex("""(?i)([反抗对]小程序)|AntiLightApp""")),
         Bili(Regex("""(?i)(有?关于)?(bili|哔哩)+([相有]关)?""")),
         BuiltInReply(Regex("""(?i)(内置(回复|[响回]应))|BuiltInReply""")),
-        Button(Regex("""(?i)(((mea|aqua)|[咩夸])+([语声]音)按钮)|Button""")),
+        Button(Regex("""(?i)(((mea|aqua)|[咩夸])+([语声]音)|按钮)|Button""")),
         CheckIn(Regex("""(?i)((有?关于)?签到([相有]关)?)|CheckIn""")),
         Help(Regex("""(?i)((有?关于)?帮助([相有]关)?)|Help""")),
         Information(Regex("""(?i)(有?关于)?[信消]息获[取得]([相有]关)?""")),

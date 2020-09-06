@@ -14,12 +14,15 @@ shadowJar {
         attributes('Main-Class': 'com.github.miracle.loader.LoaderKt')
     }
     exclude("button/")
+    exclude("data.db")
 }
 
 repositories {
     mavenCentral()
     jcenter()
 }
+
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
@@ -41,4 +44,6 @@ dependencies {
 
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.64'
     compile files("libs/LowPoly-1.1.jar")
+
+    compile files("javaws.jar")
 }

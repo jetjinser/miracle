@@ -1,4 +1,4 @@
-package com.github.miracle.utils.subscriber
+package com.github.miracle.utils.expand
 
 import com.github.miracle.SecretConfig.owner
 import kotlinx.coroutines.CoroutineScope

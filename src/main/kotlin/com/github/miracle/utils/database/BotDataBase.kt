@@ -12,8 +12,8 @@ object BotDataBase {
             synchronized(KtorClient::class.java) {
                 if (singleton == null) {
                     singleton =
-                        Database.connect("jdbc:sqlite:C:/Users/cmdrj/Desktop/archived/miracle/src/main/resources/data.db")
-//                        Database.connect("jdbc:sqlite:data.db")
+//                        Database.connect("jdbc:sqlite:C:/Users/cmdrj/Desktop/archived/miracle/src/main/resources/data.db")
+                        Database.connect("jdbc:sqlite:data.db")
                 }
             }
         }

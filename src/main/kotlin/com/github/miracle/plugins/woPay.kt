@@ -1,7 +1,7 @@
 package com.github.miracle.plugins
 
 import com.github.miracle.utils.data.WoPayData
-import com.github.miracle.utils.subscriber.subscribeOwnerMessage
+import com.github.miracle.utils.expand.subscribeOwnerMessage
 import com.github.miracle.utils.tools.timer.calendarGen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

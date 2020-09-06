@@ -119,7 +119,8 @@ fun Bot.seTu() {
                 add(ps)
                 add("via SauceNao")
             }.send()
-        } catch (e: MissingFieldException) {
+            // Exception in thread "main" java.lang.NoClassDefFoundError: com/sun/javaws/exceptions/MissingFieldException
+        } catch (e: Exception) {
             reply("不存在或暂不支持的返回, 后续逐步更新迭代将会解决")
         }
     }
@@ -197,11 +198,13 @@ fun Bot.seTu() {
             }
         }
 
-        val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
-        has<Image> {
-            reply("!警告: 这是实验性功能, 存在未经审查的图片")
-            if (message[Image]?.imageId == seTuCome) getSeTu()
-        }
+//        val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
+//        has<Image> {
+//            if (message[Image]?.imageId == seTuCome) {
+//                reply("!警告: 这是实验性功能, 存在未经审查的图片")
+//                getSeTu()
+//            }
+//        }
 
         Regex("""\s*动[画漫][识搜]图\s*""") matching {
             reply("请发送你要搜索的动画截图")

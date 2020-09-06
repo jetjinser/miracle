@@ -2,7 +2,7 @@ package com.github.miracle.plugins
 
 import com.github.miracle.utils.data.CheckInData
 import com.github.miracle.utils.data.TipsData
-import com.github.miracle.utils.subscriber.subscribeOwnerMessage
+import com.github.miracle.utils.expand.subscribeOwnerMessage
 import com.github.miracle.utils.tools.checkIn.CheckInModel
 import com.github.miracle.utils.tools.checkIn.CheckInPicture
 import com.github.miracle.utils.tools.checkIn.CheckInPicture.BackgroundImageType

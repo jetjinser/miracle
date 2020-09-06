@@ -9,7 +9,7 @@ import net.mamoe.mirai.getFriendOrNull
 
 fun Bot.reaction() {
     subscribeAlways<GroupEntranceAnnouncementChangeEvent> {
-        group.botAsMember.sendMessage("🔈 群公告已改变, 请及时查看\nchange by ${operatorOrBot.nameCardOrNick}")
+        group.sendMessage("🔈 群公告已改变, 请及时查看\nchange by ${operatorOrBot.nameCardOrNick}")
     }
 
     subscribeAlways<MemberJoinEvent.Invite> {
