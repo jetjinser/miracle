@@ -17,8 +17,8 @@ import net.mamoe.mirai.message.nextMessage
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
-import kotlin.random.Random
 
 fun Bot.woPay() {
     subscribeAlways<BotJoinGroupEvent> {
@@ -30,7 +30,7 @@ fun Bot.woPay() {
             val date = LocalDate.parse(WoPayData.inquire(group.id), DateTimeFormatter.ISO_DATE)
             if (date.isBefore(LocalDate.now())) {
                 launch {
-                    delay(Random.nextLong(1000, 50000))
+                    delay(TimeUnit.SECONDS.toMillis(25))
                     group.quit()
                 }
             }

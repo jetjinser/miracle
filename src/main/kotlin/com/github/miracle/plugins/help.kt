@@ -1,7 +1,6 @@
 package com.github.miracle.plugins
 
 import com.github.miracle.utils.tools.help.Helper
-import com.github.miracle.utils.tools.help.Plugin
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.subscribeGroupMessages
