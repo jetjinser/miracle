@@ -15,6 +15,9 @@ suspend fun Bot.sendToEveryGroup(message: String): Int {
         } catch (e: BotIsBeingMutedException) {
             getFriendOrNull(owner)?.sendMessage("BotIsBeingMutedException: ${it.name} (${it.id})")
             logger.info("BotIsBeingMutedException: ${it.name} (${it.id})")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            getFriendOrNull(owner)?.sendMessage("在发送到群 [${it.name} (${it.id})] 时发生了未知错误:\n${e.stackTrace}")
         }
     }
     return groups.size
