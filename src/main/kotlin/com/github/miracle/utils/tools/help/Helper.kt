@@ -61,10 +61,11 @@ class Helper(pluginName: String) {
             |       提供一条现在可以做什么的建议
         """.trimMargin()
         val music = """[Music]
-            |点歌, 暂时只支持网易云
+            |点歌, 目前支持: 网易云, 酷狗
             |可用指令:
-            |  - 点歌 <歌名>
+            |  - [网易云/酷狗]点歌 <歌名>
             |       消费 50 铜币 @see CheckIn
+            |       [网易云/酷狗] 可选, 若不指定则默认网易云
         """.trimMargin()
         val random = """[Random]
             |一些关于"随机"的指令
