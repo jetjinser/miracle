@@ -45,7 +45,7 @@ fun Bot.checkIn() {
 
         // ----
 
-        startsWith("提交", removePrefix = true, trim = true) { s ->
+        startsWith("提交 ", removePrefix = true, trim = true) { s ->
             if (message[Image] != null) {
                 reply("无法提交图片")
                 return@startsWith
