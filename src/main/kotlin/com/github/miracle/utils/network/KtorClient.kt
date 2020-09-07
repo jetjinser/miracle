@@ -1,10 +1,10 @@
 package com.github.miracle.utils.network
 
+import com.github.miracle.utils.logger.BotLogger
 import io.ktor.client.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import kotlinx.serialization.json.Json
-import com.github.miracle.utils.logger.BotLogger
 
 
 object KtorClient {

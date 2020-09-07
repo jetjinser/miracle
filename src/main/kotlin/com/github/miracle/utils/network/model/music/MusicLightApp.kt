@@ -1,11 +1,11 @@
-package com.github.miracle.utils.network.model
+package com.github.miracle.utils.network.model.music
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class NetEaseMusicLightApp(
+data class MusicLightApp(
     @SerialName("app")
     val app: String,
     @SerialName("config")

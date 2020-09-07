@@ -1,12 +1,15 @@
 package com.github.miracle.utils.tools.music
 
-import io.ktor.client.request.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import net.mamoe.mirai.message.data.LightApp
+import com.github.miracle.SecretConfig
 import com.github.miracle.utils.network.KtorClient
-import com.github.miracle.utils.network.model.NetEaseMusicApiModel
-import com.github.miracle.utils.network.model.NetEaseMusicLightApp
+import com.github.miracle.utils.network.model.music.KuGouMusicInfoApiModel
+import com.github.miracle.utils.network.model.music.KuGouMusicSearchApiModel
+import com.github.miracle.utils.network.model.music.MusicLightApp
+import com.github.miracle.utils.network.model.music.NetEaseMusicApiModel
+import io.ktor.client.request.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import net.mamoe.mirai.message.data.LightApp
 import java.net.URLEncoder
 
 @Suppress("BlockingMethodInNonBlockingContext")  // 哭了
@@ -35,9 +38,9 @@ object MusicProvider {
         val preview = song.al.picUrl
         val desc = song.ar.first().name
 
-        val music = NetEaseMusicLightApp(
+        val music = MusicLightApp(
             "com.tencent.structmsg",
-            NetEaseMusicLightApp.Config(
+            MusicLightApp.Config(
                 true,
                 ctime,
                 true,
@@ -45,13 +48,13 @@ object MusicProvider {
                 "normal"
             ),
             "音乐",
-            NetEaseMusicLightApp.Extra(
+            MusicLightApp.Extra(
                 1,
                 100495085,
                 6863003740196404000
             ),
-            NetEaseMusicLightApp.Meta(
-                NetEaseMusicLightApp.MusicX(
+            MusicLightApp.Meta(
+                MusicLightApp.MusicX(
                     "",
                     "",
                     1,
@@ -71,7 +74,71 @@ object MusicProvider {
             "0.0.0.1",
             "music"
         )
-        val json = Json.encodeToString(music)
+        val json = KtorClient.json.encodeToString(music)
+        return LightApp(json)
+    }
+
+    suspend fun kuGouMusicGen(searchMusicName: String): LightApp? {
+        val searchUrl =
+            "http://mobilecdn.kugou.com/api/v3/search/song?format=json&keyword=$searchMusicName&page=1&pagesize=1&showtype=1"
+
+        val client = KtorClient.getInstance() ?: return null
+
+        val resp = client.get<String>(searchUrl)
+        val searchApiModel = KtorClient.json.decodeFromString<KuGouMusicSearchApiModel>(resp)
+
+        val hash = searchApiModel.data.info.firstOrNull()?.hash ?: return null
+
+        val infoUrl = "https://www.kugou.com/yy/index.php?r=play/getdata&hash=$hash"
+
+        val infoResp = client.get<String>(infoUrl) {
+            headers {
+                set("Cookie", "kg_mid=${SecretConfig.kgMid}")
+            }
+        }
+
+        val infoModel = KtorClient.json.decodeFromString<KuGouMusicInfoApiModel>(infoResp)
+
+        val ctime = System.currentTimeMillis() / 1000
+        val data = infoModel.data
+
+        val music = MusicLightApp(
+            "com.tencent.structmsg",
+            MusicLightApp.Config(
+                true,
+                ctime,
+                true,
+                "114514",
+                "normal"
+            ),
+            "音乐",
+            MusicLightApp.Extra(
+                1,
+                100495085,
+                6863003740196404000
+            ),
+            MusicLightApp.Meta(
+                MusicLightApp.MusicX(
+                    "",
+                    "",
+                    1,
+                    100495085,
+                    data.authorName, // singer
+                    "",
+                    data.playUrl,
+                    data.img,
+                    "",
+                    "0",
+                    "",
+                    "酷狗音乐 via SongOrder",
+                    data.songName
+                )
+            ),
+            "[分享]${data.songName} via SongOrder",
+            "0.0.0.1",
+            "music"
+        )
+        val json = KtorClient.json.encodeToString(music)
         return LightApp(json)
     }
 }

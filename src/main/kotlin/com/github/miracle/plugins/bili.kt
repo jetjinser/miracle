@@ -37,7 +37,7 @@ fun Bot.bili() {
                 buildMessageChain {
                     add(imageStream.uploadAsImage())
                     add(
-                        "${data.title} / ${data.owner.name}\n${data.desc}\n$biliUrl\n"
+                        "${data.title} / ${data.owner.name}\n$biliUrl\n"
                     )
                     add(
                         "⌘ ${stat.view} 👍 ${stat.like} ⓒ ${stat.coin} ⮬ ${stat.share}\n"

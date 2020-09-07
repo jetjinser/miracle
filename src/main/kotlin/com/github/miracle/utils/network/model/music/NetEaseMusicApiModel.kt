@@ -1,4 +1,4 @@
-package com.github.miracle.utils.network.model
+package com.github.miracle.utils.network.model.music
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -17,8 +17,6 @@ data class BiliViewModel(
         val pic: String,
         @SerialName("title")
         val title: String,
-        @SerialName("desc")
-        val desc: String,
         @SerialName("owner")
         val owner: Owner,
         @SerialName("stat")
