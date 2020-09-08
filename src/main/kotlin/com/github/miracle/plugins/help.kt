@@ -10,7 +10,7 @@ import net.mamoe.mirai.message.data.PlainText
 fun Bot.help() {
     val pluginNameArray = arrayOf(
         "反小程序", "bilibili", "内置回复", "按钮", "签到",
-        "帮助", "信息", "音乐", "随机", "响应", "提醒", "内置提醒", "设置", "图灵", "词库", "WoPay"
+        "帮助", "信息", "音乐", "随机", "响应", "提醒", "内置提醒", "设置", "图灵", "词库", "翻译", "WoPay"
     )
 
     subscribeGroupMessages(priority = Listener.EventPriority.LOW) {

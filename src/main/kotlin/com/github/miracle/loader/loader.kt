@@ -35,6 +35,7 @@ suspend fun main() {
         woPay()
         help()
         manage()
+        translate()
     }
 
     bot.join()

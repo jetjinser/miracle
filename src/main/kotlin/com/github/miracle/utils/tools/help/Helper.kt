@@ -103,6 +103,11 @@ class Helper(pluginName: String) {
             |  - 添加问<Q>答<A>
             |       每次消耗 200 铜币
         """.trimMargin()
+        val translate = """[Translate]
+            |谷歌翻译
+            |可用指令:
+            |  - 翻译 <原文>
+        """.trimMargin()
         val woPay = """[WoPay]
             |可用指令:
             |  - @bot token
@@ -128,6 +133,7 @@ class Helper(pluginName: String) {
             Plugin.EPlugin.Tuling -> tuling
             Plugin.EPlugin.Thesaurus -> thesaurus
             Plugin.EPlugin.WoPay -> woPay
+            Plugin.EPlugin.Translate -> translate
             else -> null
         }
 }
