@@ -25,6 +25,7 @@ fun Bot.help() {
                     """我目前的功能有:
                         |${pluginNameArray.joinToString("\n")}
                         |可发送 帮助 <功能名> 来查看详情
+                        |反馈可加群: 117340135
                         |readme: 待填
                     """.trimMargin()
                 )
