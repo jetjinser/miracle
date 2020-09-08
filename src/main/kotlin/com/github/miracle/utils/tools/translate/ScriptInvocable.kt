@@ -21,7 +21,7 @@ object ScriptInvocable {
     private val engineManager = ScriptEngineManager()
     private val engine: ScriptEngine = engineManager.getEngineByName("nashorn")
     val invocable =
-//        Files.newBufferedReader(Paths.get("com/github/miracle/utils/tools/translate/tk.js")).createInvocable(engine)
-        Files.newBufferedReader(Paths.get("C:\\Users\\cmdrj\\Desktop\\archived\\miracle\\src\\main\\kotlin\\com\\github\\miracle\\utils\\tools\\translate\\tk.js"))
+        Files.newBufferedReader(Paths.get("tk.js"))
+//        Files.newBufferedReader(Paths.get("C:\\Users\\cmdrj\\Desktop\\archived\\miracle\\src\\main\\kotlin\\com\\github\\miracle\\utils\\tools\\translate\\tk.js"))
             .createInvocable(engine)
 }

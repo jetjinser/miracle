@@ -5,19 +5,34 @@ import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.tools.translate.ScriptInvocable
 import io.ktor.client.request.*
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.nextMessage
+import java.util.concurrent.TimeUnit
 
 private fun CharSequence.isContainChinese(): Boolean {
     return Regex("[\u4e00-\u9fa5]").containsMatchIn(this)
 }
 
 fun Bot.translate() {
-    subscribeGroupMessages {
-        Regex("""(?i)\s*(翻译|fanyi|translate).*""") matching regex@{
-            val original = Regex("""(?i)翻译|fanyi|translate""").replace(it.trim(), "").trim()
+    subscribeGroupMessages(priority = Listener.EventPriority.LOWEST) {
+        Regex("""(?i).*(翻译|fanyi|translate).*""") matching regex@{
+            val at = message[At]
+            if (at != null) if (!at.isBot()) return@regex
 
-            if (original.isEmpty()) return@regex
+            val m = message.filter { it.isPlain() }
+            val first = m.asMessageChain().content
 
+            var original = Regex("""(?i)翻译|fanyi|translate""").replace(first.trim(), "").trim()
+
+            original = if (original.isEmpty()) {
+                reply("你要翻译什么?")
+                intercept()
+                nextMessage(timeoutMillis = TimeUnit.MINUTES.toMillis(3), priority = Listener.EventPriority.HIGH) {
+                    message[PlainText] != null
+                }.content
+            } else original
             val tl = if (original.isContainChinese()) "auto" else "zh-CN"
 
             val tk = ScriptInvocable.invocable.invokeFunction("tk", original, tkk)
