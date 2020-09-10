@@ -27,8 +27,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
     // mirai
-    implementation "net.mamoe:mirai-core:1.2.1"
-    implementation "net.mamoe:mirai-core-qqandroid:1.2.1"
+    implementation "net.mamoe:mirai-core:1.2.2"
+    implementation "net.mamoe:mirai-core-qqandroid:1.2.2"
 
     // The needs of the bot
     implementation("io.ktor:ktor-client-serialization:1.4.0")

@@ -14,7 +14,7 @@ object Plugin {
         Reaction(Regex("""(?i)(被动[反响回][应答])|Reaction""")),
 
         //    Recode("消息记录")
-        Remind(Regex("""(?i)(定[时点]提[醒示])|Remind""")),
+        Remind(Regex("""(?i)((定[时点])?提[醒示])|Remind""")),
         Scheduler(Regex("""(?i)((内置|默认)(定时器?|闹[钟铃]|提[醒示]))|Scheduler""")),
         Setting(Regex("""(?i)((有?关于)?设[置定]([相有]关)?)|Setting""")),
         Tuling(Regex("""(?i)(图灵(回[复答]|[问答]+|对话|交流))|Tuling""")),

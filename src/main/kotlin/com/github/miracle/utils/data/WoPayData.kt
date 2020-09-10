@@ -1,15 +1,14 @@
 package com.github.miracle.utils.data
 
 import com.github.miracle.utils.database.BotDataBase
-import com.github.miracle.utils.database.BotDataBase.Token
 import com.github.miracle.utils.database.BotDataBase.Deadline
+import com.github.miracle.utils.database.BotDataBase.Token
 import com.github.miracle.utils.logger.BotLogger
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.NoSuchElementException
 
 object WoPayData {
     private val dataBase: Database? = BotDataBase.getInstance()
@@ -45,13 +44,53 @@ object WoPayData {
         }
     }
 
+    private fun getDateAfterRenewal(days: Int, groupId: Long): LocalDate? {
+        var deadline = LocalDate.now()
+        val query = deadlineQuerySource
+            ?.select(Deadline.deadline)
+            ?.where { Deadline.groupId eq groupId }
+
+        if (query?.totalRecords == 0) {
+            // 此时 dateNow 是 deadline
+            register(groupId, deadline.toString())
+        } else {
+            // 此时 select, deadline 为 deadline
+            if (query != null) {
+                val qDeadline = LocalDate.parse(
+                    query.iterator().next()[Deadline.deadline],
+                    DateTimeFormatter.ISO_DATE
+                )
+                if (!qDeadline.isBefore(LocalDate.now())) {
+                    deadline = qDeadline
+                } // else dateNow
+            } else return null
+        }
+
+        return deadline.plusDays(days.toLong())
+    }
+
+    fun renewDirect(days: Int, groupId: Long): LocalDate? {
+        val newDeadline = getDateAfterRenewal(days, groupId) ?: return null
+
+        dataBase?.apply {
+            update(Deadline) {
+                it.deadline to newDeadline.toString()
+                where {
+                    Deadline.groupId eq groupId
+                }
+            }
+        }
+
+        return newDeadline
+    }
+
     /**
      * 续期
      * @param token 凭借 token 查询对应的天数来续期
      * @param groupId 续期的群号码
      * @return 续期后的日期, null 时表示失败: token 不存在
      */
-    fun renew(token: String, groupId: Long): String? {
+    fun renewByToken(token: String, groupId: Long): String? {
         val daysQuery = tokenQuerySource
             ?.select(Token.day)
             ?.where { Token.token eq token }
@@ -61,28 +100,11 @@ object WoPayData {
         val days = daysQuery?.iterator()?.next()
             ?.get(Token.day) ?: return null
 
-        var deadline = LocalDate.now()
+        val newDeadline = getDateAfterRenewal(days, groupId) ?: return null
 
-        val query = deadlineQuerySource
-            ?.select(Deadline.deadline)
-            ?.where { Deadline.groupId eq groupId }
-        if (query?.totalRecords == 0) {
-            // 此时 dateNow 是 deadline
-            register(groupId, deadline.toString())
-        } else {
-            // 此时 select, deadline 为 deadline
-            if (query != null) {
-                deadline = LocalDate.parse(
-                    query.iterator().next()[Deadline.deadline],
-                    DateTimeFormatter.ISO_DATE
-                )
-            } else return null
-        }
-
-        val newDeadline = deadline.plusDays(days.toLong()).toString()
         dataBase?.apply {
             update(Deadline) {
-                it.deadline to newDeadline
+                it.deadline to newDeadline.toString()
                 where {
                     Deadline.groupId eq groupId
                 }
@@ -93,7 +115,7 @@ object WoPayData {
             }
         }
 
-        return newDeadline
+        return newDeadline.toString()
     }
 
     /**
