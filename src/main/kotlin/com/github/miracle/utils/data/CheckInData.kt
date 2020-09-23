@@ -25,6 +25,29 @@ class CheckInData(private val event: GroupMessageEvent) {
     private var _cuprum: Int? = null
     private var _favor: Int? = null
 
+    init {
+        query = dataBase?.from(User)?.select()?.where { User.QQId eq event.sender.id }
+
+        if (query?.totalRecords == 0) {
+            registerUser()
+            logger.info("新增用户 ${event.senderName}, 已录入数据库")
+
+            _favor = 0
+            _cuprum = 0
+            _card = event.sender.nameCard
+            _checkInDays = 0
+            _lastCheckInDay = "1970-01-01"
+        } else {
+            query?.forEach {
+                _card = it[User.card]
+                _checkInDays = it[User.checkInDays]
+                _lastCheckInDay = it[User.lastCheckInDay]
+                _cuprum = it[User.cuprum]
+                _favor = it[User.favor]
+            }
+        }
+    }
+
     suspend fun consumeCuprum(amount: Int, block: suspend (Pair<Boolean, Int?>) -> Boolean = { true }): Pair<Boolean, Int?> {
         val cuprum = cuprum
         if (cuprum != null) {
@@ -46,7 +69,7 @@ class CheckInData(private val event: GroupMessageEvent) {
     /**
      * 注册 / 初始化 User 到数据库
      */
-    private fun registeredUser() {
+    private fun registerUser() {
         dataBase?.insert(User) {
             it.favor to 0
             it.cuprum to 0
@@ -55,29 +78,6 @@ class CheckInData(private val event: GroupMessageEvent) {
             it.card to event.sender.nameCard
             it.checkInDays to 0
             it.lastCheckInDay to "1970-01-01"
-        }
-    }
-
-    init {
-        query = dataBase?.from(User)?.select()?.where { User.QQId eq event.sender.id }
-
-        if (query?.totalRecords == 0) {
-            registeredUser()
-            logger.info("新增用户 ${event.senderName}, 已录入数据库")
-
-            _favor = 0
-            _cuprum = 0
-            _card = event.sender.nameCard
-            _checkInDays = 0
-            _lastCheckInDay = "1970-01-01"
-        } else {
-            query?.forEach {
-                _card = it[User.card]
-                _checkInDays = it[User.checkInDays]
-                _lastCheckInDay = it[User.lastCheckInDay]
-                _cuprum = it[User.cuprum]
-                _favor = it[User.favor]
-            }
         }
     }
 
