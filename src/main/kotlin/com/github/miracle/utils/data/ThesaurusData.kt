@@ -8,6 +8,7 @@ import org.sqlite.SQLiteException
 import com.github.miracle.utils.database.BotDataBase
 import com.github.miracle.utils.database.BotDataBase.Thesaurus
 import com.github.miracle.utils.logger.BotLogger
+import net.mamoe.mirai.message.data.isPlain
 import kotlin.random.Random.Default.nextDouble
 
 class ThesaurusData(private val event: GroupMessageEvent) {
@@ -17,7 +18,7 @@ class ThesaurusData(private val event: GroupMessageEvent) {
 
     private var _answerList: MutableList<String> = mutableListOf()
 
-    private val contentStringMiraiCode = event.message.drop(1).asMessageChain().toString()
+    private val contentStringMiraiCode = event.message.filter { it.isPlain() }.joinToString("")
 
     init {
         query = dataBase?.from(Thesaurus)?.select(Thesaurus.answer)?.where {

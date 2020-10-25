@@ -12,8 +12,8 @@ data class MusicLightApp(
     val config: Config,
     @SerialName("desc")
     val desc: String,
-    @SerialName("extra")
-    val extra: Extra,
+//    @SerialName("extra")
+//    val extra: Extra,
     @SerialName("meta")
     val meta: Meta,
     @SerialName("prompt")
@@ -37,15 +37,15 @@ data class MusicLightApp(
         val type: String
     )
 
-    @Serializable
-    data class Extra(
-        @SerialName("app_type")
-        val appType: Int,
-        @SerialName("appid")
-        val appid: Int,
-        @SerialName("msg_seq")
-        val msgSeq: Long
-    )
+//    @Serializable
+//    data class Extra(
+//        @SerialName("app_type")
+//        val appType: Int,
+//        @SerialName("appid")
+//        val appid: Int,
+//        @SerialName("msg_seq")
+//        val msgSeq: Long
+//    )
 
     @Serializable
     data class Meta(

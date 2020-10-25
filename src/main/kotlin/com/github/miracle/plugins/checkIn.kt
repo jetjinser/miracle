@@ -11,6 +11,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.nextMessage
@@ -46,7 +47,8 @@ fun Bot.checkIn() {
 
         // ----
 
-        startsWith("提交 ", removePrefix = true, trim = true) { s ->
+
+        startsWith("提交 ", removePrefix = true) { s ->
             if (message[Image] != null) {
                 reply("无法提交图片")
                 return@startsWith
@@ -59,9 +61,9 @@ fun Bot.checkIn() {
                 return@startsWith
             }
 
-            var tip = s
+            var tip = s.trim()
             if (tip.isEmpty()) {
-                tip = nextMessage(3.minutesToMillis) { message.content.isNotEmpty() }.content
+                tip = nextMessage(3.minutesToMillis) { message.content.isNotEmpty() }.content.trim()
                 if (tip in listOf("算了", "取消", "不要了")) {
                     reply("好的")
                     return@startsWith
@@ -83,14 +85,17 @@ fun Bot.checkIn() {
             }
         }
 
-        case("历史提交", trim = true) {
+        startsWith("历史提交", removePrefix = true, trim = true) { s ->
+            val page = s.toIntOrNull() ?: 1
             val history = TipsData.getHistory(sender.id)
             if (history != null) {
                 buildMessageChain {
-                    history.forEach {
+                    history.drop((page - 1) * 10).take(page * 10).forEach {
                         val symbol = if (it.review == null) "*" else if (it.review) "√" else "×"
                         add("${it.id} - ${it.tip} | $symbol\n")
                     }
+                    add("Page $page/${if (history.size % 10 == 0) history.size / 10 else (history.size / 10) + 1}\n")
+                    add("可发送格式: `历史提交 [page]` 来选择页码\n")
                     add("via checkInTips")
                 }.send()
             } else reply("你还没有提交过tip")

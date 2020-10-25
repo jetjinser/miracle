@@ -78,7 +78,7 @@ fun Bot.tuling() {
 private object Store {
     var index: Int = 0
         get() {
-            if (field == 11) field = 0
+            if (field == 10) field = 0
             return field
         }
 }

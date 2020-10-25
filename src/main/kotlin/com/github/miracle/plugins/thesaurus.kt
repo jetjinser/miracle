@@ -17,19 +17,24 @@ fun Bot.thesaurus() {
                 val answer = groupValues[3]
                 val thesaurusDate = ThesaurusData(this@regex)
                 CheckInData(this@regex).consumeCuprum(200) {
-                    val success = thesaurusDate.add(question, answer, globalToken)
-                    return@consumeCuprum if (success) {
-                        buildMessageChain {
-                            add("${if (globalToken) "全局" else ""}添加成功\nⓆ: [")
-                            add(question.parseMiraiCode())
-                            add("]\nⒶ: [")
-                            add(answer.parseMiraiCode())
-                            add("]\n")
-                            add("via thesaurus")
-                        }.send()
-                        true
+                    if (it.first) {
+                        val success = thesaurusDate.add(question, answer, globalToken)
+                        return@consumeCuprum if (success) {
+                            buildMessageChain {
+                                add("${if (globalToken) "全局" else ""}添加成功\nⓆ: [")
+                                add(question.parseMiraiCode())
+                                add("]\nⒶ: [")
+                                add(answer.parseMiraiCode())
+                                add("]\n")
+                                add("via thesaurus")
+                            }.send()
+                            true
+                        } else {
+                            reply("添加失败, 已存在相同的问答\nⓆ: [$question]\nⒶ: [$answer]\nvia thesaurus")
+                            false
+                        }
                     } else {
-                        reply("添加失败, 已存在相同的问答\nⓆ: [$question]\nⒶ: [$answer]\nvia thesaurus")
+                        reply("铜币不足 200 , 添加取消, 铜币可由签到获得\n当前铜币: ${it.second}")
                         false
                     }
                 }

@@ -48,6 +48,10 @@ class CheckInData(private val event: GroupMessageEvent) {
         }
     }
 
+    /**
+     * 消费铜币
+     * @return Pari<successOrNot, currentCuprum>
+     */
     suspend fun consumeCuprum(amount: Int, block: suspend (Pair<Boolean, Int?>) -> Boolean = { true }): Pair<Boolean, Int?> {
         val cuprum = cuprum
         if (cuprum != null) {

@@ -27,9 +27,7 @@ object MusicProvider {
 
         val client = KtorClient.getInstance() ?: return null
 
-        val model = client.post<NetEaseMusicApiModel>(url) {
-
-        }
+        val model = client.post<NetEaseMusicApiModel>(url)
 
         val ctime = System.currentTimeMillis() / 1000
         val song = model.result.songs.first()
@@ -44,15 +42,15 @@ object MusicProvider {
                 true,
                 ctime,
                 true,
-                "114514",
+                "93cb506574a4af2ab61c3df05df204f9",
                 "normal"
             ),
             "音乐",
-            MusicLightApp.Extra(
-                1,
-                100495085,
-                6863003740196404000
-            ),
+//            MusicLightApp.Extra(
+//                1,
+//                100495085,
+//                6863003740196404000
+//            ),
             MusicLightApp.Meta(
                 MusicLightApp.MusicX(
                     "",
@@ -112,11 +110,11 @@ object MusicProvider {
                 "normal"
             ),
             "音乐",
-            MusicLightApp.Extra(
-                1,
-                100495085,
-                6863003740196404000
-            ),
+//            MusicLightApp.Extra(
+//                1,
+//                100495085,
+//                6863003740196404000
+//            ),
             MusicLightApp.Meta(
                 MusicLightApp.MusicX(
                     "",
