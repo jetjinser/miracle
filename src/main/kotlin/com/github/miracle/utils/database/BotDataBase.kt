@@ -75,4 +75,10 @@ object BotDataBase {
         val day = int("day")
     }
     // end region
+
+    object BiliSubscription : Table<Nothing>("BiliSubscription") {
+        val groupId = long("group_id").primaryKey()
+        val roomId = long("room_id").primaryKey()
+        val uname = varchar("uname")
+    }
 }

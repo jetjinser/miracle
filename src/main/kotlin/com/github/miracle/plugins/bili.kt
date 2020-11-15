@@ -1,18 +1,34 @@
 package com.github.miracle.plugins
 
+import com.github.miracle.utils.data.BiliSubData
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.BiliCvModel
+import com.github.miracle.utils.network.model.BiliLiveModel
 import com.github.miracle.utils.network.model.BiliViewModel
 import com.github.miracle.utils.tools.bili.AvBv
+import com.github.miracle.utils.tools.bili.BiliLiveRoom
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.MessageEvent
+import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.data.sendTo
 import net.mamoe.mirai.message.nextMessage
+import net.mamoe.mirai.message.sendAsImageTo
+import net.mamoe.mirai.message.uploadAsImage
 import net.mamoe.mirai.utils.minutesToMillis
+import net.mamoe.mirai.utils.secondsToMillis
+import java.io.InputStream
+import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.concurrent.schedule
 
 fun Bot.bili() {
     suspend fun MessageEvent.biliView(message: String) {
@@ -108,9 +124,103 @@ fun Bot.bili() {
         }
 
 
-        // bilibili 订阅
-//        startsWith("b订阅", removePrefix = true, trim = true) {
-//
-//        }
+        // bilibili 订阅 region
+        Regex("""\s*b订阅 +\w+\s*""") matching regex@{
+            val msg = it.substringAfter("b订阅").trim()
+            if (msg.isEmpty()) return@regex
+            val bid = msg.toLongOrNull()
+            if (bid == null) {
+                reply("房间号是数字喔")
+                return@regex
+            } else {
+                val live = BiliLiveRoom.getBiliLiveUname(bid)
+                if (live == null) {
+                    // 不存在
+                    reply("订阅失败, 请确认房间号正确")
+                    return@regex
+                }
+
+                if (BiliSubData.subscribe(group.id, bid)) {
+                    // 已经插入到数据库里了
+                    val data = live.data
+                    reply(
+                        "${data.uname} :: ${data.roomId}\n订阅成功"
+                    )
+                } else {
+                    reply("你已经订阅过了: $bid")
+                }
+            }
+        }
+
+        case("b订阅列表") {
+            val list = BiliSubData.getSubList(group.id)
+            if (list == null) {
+                reply("本群还没有订阅")
+            } else {
+                reply(
+                    list.joinToString("\n") {
+                        "${it.first} - ${it.second}"
+                    }
+                )
+            }
+        }
+
+        Regex("""\s*b取订 +\w+\s*""") matching regex@{
+            val msg = it.substringAfter("b取订").trim()
+            if (msg.isEmpty()) return@regex
+            val bid = msg.toLongOrNull()
+            if (bid == null) {
+                reply("房间号是数字喔")
+                return@regex
+            } else {
+                val success = BiliSubData.unsubscribe(group.id, bid)
+                if (success) reply("取订成功: $bid") else reply("你没有订阅过这个房间")
+            }
+        }
     }
+
+    suspend fun Bot.sendBiliLive(bid: Long, groupId: List<Long>, model: BiliLiveModel) {
+        groupId.forEach {
+            val bi = model.data.anchorInfo.baseInfo
+            val ri = model.data.roomInfo
+            coroutineScope {
+                launch {
+                    val client = KtorClient.getInstance() ?: return@launch
+                    val stream = client.get<InputStream>(ri.keyframe)
+                    val contact = getGroup(it)
+                    buildMessageChain {
+                        add(stream.uploadAsImage(contact))
+                        add("${ri.title} / ${bi.uname}\n")
+                        add("直播开始时间: ${SimpleDateFormat("H-mm-ss").format(ri.liveStartTime * 1000)}")
+                    }.sendTo(contact)
+                    delay(2000)
+                }
+            }
+        }
+    }
+
+    Timer().schedule(Date(), 15.secondsToMillis) {
+        val pair = BiliSubData.nextSub()
+        launch {
+            val map = pair.first
+            val cache = pair.second
+
+            val bid = map.key
+            val groupId = map.value
+
+            val model = BiliLiveRoom.getBiliLive(bid) ?: return@launch
+            val status = model.data.roomInfo.liveStatus
+
+            val live = if (status == 0) false else status == 1
+            if (live) {
+                if (cache[bid] != true) {
+                    BiliSubData.markLiving(bid)
+                    sendBiliLive(bid, groupId, model)
+                }
+            } else {
+                if (cache[bid] != false) BiliSubData.markUnliving(bid)
+            }
+        }
+    }
+    // end region
 }

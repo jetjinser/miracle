@@ -1,14 +1,13 @@
 package com.github.miracle.utils.data
 
-import me.liuwj.ktorm.database.Database
-import me.liuwj.ktorm.dsl.*
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.data.asMessageChain
-import org.sqlite.SQLiteException
 import com.github.miracle.utils.database.BotDataBase
 import com.github.miracle.utils.database.BotDataBase.Thesaurus
 import com.github.miracle.utils.logger.BotLogger
+import me.liuwj.ktorm.database.Database
+import me.liuwj.ktorm.dsl.*
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.isPlain
+import org.sqlite.SQLiteException
 import kotlin.random.Random.Default.nextDouble
 
 class ThesaurusData(private val event: GroupMessageEvent) {
