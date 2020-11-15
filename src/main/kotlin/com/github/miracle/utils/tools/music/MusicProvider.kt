@@ -42,7 +42,7 @@ object MusicProvider {
                 true,
                 ctime,
                 true,
-                "93cb506574a4af2ab61c3df05df204f9",
+                "qq, wdnmd",
                 "normal"
             ),
             "音乐",
