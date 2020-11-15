@@ -17,9 +17,9 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 fun Bot.reaction() {
-    subscribeAlways<GroupEntranceAnnouncementChangeEvent> {
-        group.sendMessage("🔈 群公告已改变, 请及时查看\nchange by ${operatorOrBot.nameCardOrNick}")
-    }
+//    subscribeAlways<GroupEntranceAnnouncementChangeEvent> {
+//        group.sendMessage("🔈 群公告已改变, 请及时查看\nchange by ${operatorOrBot.nameCardOrNick}")
+//    }
 
     subscribeAlways<BotJoinGroupEvent> {
         group.sendMessage("大家好")
@@ -56,11 +56,11 @@ fun Bot.reaction() {
 //        )
 //    }
 
-    subscribeAlways<BotLeaveEvent.Active> {
-        getFriendOrNull(owner)?.sendMessage(
-            "已离开群 ${group.name}(${group.id})"
-        )
-    }
+//    subscribeAlways<BotLeaveEvent.Active> {
+//        getFriendOrNull(owner)?.sendMessage(
+//            "已离开群 ${group.name}(${group.id})"
+//        )
+//    }
 
 //    subscribeAlways<MemberLeaveEvent.Kick> {
 //        group.sendMessage(
@@ -73,34 +73,7 @@ fun Bot.reaction() {
 //        group.botAsMember.sendMessage("🔈 ${member.nick}(${member.nameCard})退出本群")
 //    } 感觉会很吵
 
-    subscribeAlways<BotInvitedJoinGroupRequestEvent>(priority = Listener.EventPriority.HIGH) {
-        intercept()
-        val date = LocalDate.parse(WoPayData.inquire(this.groupId), DateTimeFormatter.ISO_DATE).minusDays(1)
-        if (date.isBefore(LocalDate.now())) {
-            launch {
-                logger.info("$groupName($groupId) 邀请入群, 第一次?")
-                delay(TimeUnit.SECONDS.toMillis(25))
-                accept()
-                delay(TimeUnit.SECONDS.toMillis(5))
-                getGroupOrNull(groupId)?.apply {
-                    getFriendOrNull(SecretConfig.owner)?.sendMessage(
-                        "$groupName($groupId) 邀请入群, 已加入并注册"
-                    )
-                    sendMessage("bot已到期, 如有意愿续费请加群了解:\n117340135\nps: 五分钟后退群")
-                    delay(TimeUnit.MINUTES.toMillis(5))
-                    quit()
-                }
-            }
-        } else {
-            logger.info("加入 $groupName($groupId)")
-            accept()
-            getFriendOrNull(owner)?.sendMessage(
-                "$groupName($groupId) 邀请入群, 已加入"
-            )
-        }
-    }
-
-    subscribeAlways<MemberSpecialTitleChangeEvent> {
-        group.sendMessage("${member.nameCardOrNick}获得头衔：$new \nAwarded by ${operatorOrBot.nameCardOrNick}")
-    }
+//    subscribeAlways<MemberSpecialTitleChangeEvent> {
+//        group.sendMessage("${member.nameCardOrNick}获得头衔：$new \nAwarded by ${operatorOrBot.nameCardOrNick}")
+//    }
 }
