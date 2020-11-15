@@ -9,7 +9,6 @@ import com.github.miracle.utils.network.model.LoliconSeTuModel
 import com.github.miracle.utils.network.model.SauceNaoModel
 import com.github.miracle.utils.network.model.TraceMoeInfoModel
 import com.github.miracle.utils.network.model.TraceMoeModel
-import com.sun.javaws.exceptions.MissingFieldException
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -22,54 +21,75 @@ import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.code.parseMiraiCode
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.nextMessage
+import net.mamoe.mirai.message.recallIn
 import net.mamoe.mirai.utils.minutesToMillis
+import net.mamoe.mirai.utils.secondsToMillis
 import java.io.InputStream
 import java.text.DecimalFormat
 
 fun Bot.seTu() {
-    suspend fun GroupMessageEvent.getSeTu() {
-//        val pair = CheckInData(this).consumeCuprum(100)
-//        if (!pair.first) {
-//            reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
-//            return
-//        }
+    suspend fun GroupMessageEvent.seTuEmission(keyword: String? /* = null */) {
+        val checkInData = CheckInData(this)
 
-        reply("少女祈祷中")
-
-        val client = KtorClient.getInstance() ?: return
-
-        // TODO 缓存
-        val url = "https://api.lolicon.app/setu/?r18=0&apikey=$loliconSeTuApiKey"
-        val response = client.get<HttpResponse>(url)
-
-        val model = Json.decodeFromString<LoliconSeTuModel>(response.readText())
-
-        if (response.status.value == 429) {
-            logger.info("达到请求上限: ${model.quotaMinTtl}s 后恢复")
-            reply("达到请求上限, 距离下一次调用额度恢复还有 ${model.quotaMinTtl}s")
+        if (checkInData.favor ?: 0 <= 50) {
+            reply("不！我不喜欢你")
             return
         }
 
-        val data = model.data.first()
-
-        try {
-            val imageResponse = client.get<HttpResponse>(data.url)
-
-            if (imageResponse.status.value == 200) {
-                buildMessageChain {
-                    add(imageResponse.receive<InputStream>().uploadAsImage())
-                    add("\npid: ${data.pid}\nuid: ${data.uid}\n")
-                    add("via seTu")
-                }.send()
+        checkInData.consumeCuprum(100) { pair ->
+            return@consumeCuprum if (!pair.first) {
+                reply("铜币不足 100 , 获取色图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+                false
             } else {
-                reply("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
-                logger.warning("${data.url} 下载失败")
+                reply("少女祈祷中")
+
+                val client = KtorClient.getInstance() ?: return@consumeCuprum false
+
+                // TODO 缓存
+                var url = "https://api.lolicon.app/setu/?r18=2&apikey=$loliconSeTuApiKey"
+                if (!keyword.isNullOrEmpty()) url += "&keyword=$keyword"
+                val response = client.get<HttpResponse>(url)
+
+                val model = Json.decodeFromString<LoliconSeTuModel>(response.readText())
+
+                if (response.status.value == 429) {
+                    logger.info("达到请求上限: ${model.quotaMinTtl}s 后恢复")
+                    reply("达到请求上限, 距离下一次调用额度恢复还有 ${model.quotaMinTtl}s")
+                    return@consumeCuprum false
+                }
+
+                val data = model.data.also {
+                    if (it.isEmpty()) {
+                        reply("关键字 [$keyword] 没有结果")
+                        return@consumeCuprum false
+                    }
+                }.first()
+
+                try {
+                    val imageResponse = client.get<HttpResponse>(data.url)
+
+                    if (imageResponse.status.value == 200) {
+                        quoteReply(
+                            "title: ${data.title}\nauthor: ${data.author}\n" +
+                                    "tags: ${data.tags.joinToString(", ")}\nhttps://www.pixiv.net/artworks/${data.pid}"
+                        )
+                        imageResponse.receive<InputStream>().uploadAsImage()
+                            .send().recallIn(75.secondsToMillis)
+                        return@consumeCuprum true
+                    } else {
+                        reply("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
+                        logger.warning("${data.url} 下载失败")
+                        return@consumeCuprum false
+                    }
+                } catch (e: ConnectTimeoutException) {
+                    reply("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
+                    logger.warning("${data.url} 下载失败")
+                    return@consumeCuprum false
+                }
             }
-        } catch (e: ConnectTimeoutException) {
-            reply("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
-            logger.warning("${data.url} 下载失败")
         }
     }
+
 
     suspend fun GroupMessageEvent.searchSeTu(imageUrl: String) {
         val pair = CheckInData(this).consumeCuprum(100)
@@ -172,8 +192,6 @@ fun Bot.seTu() {
     }
 
     subscribeGroupMessages {
-//        Regex("(?:来一?[点张份]?)?[色瑟涩]图来?") matching { getSeTu(); }
-
         Regex("""\s*[pP][识搜]图\s*""") matching {
             reply("请发送你要搜索的二次元图片")
             val messageChain = nextMessage(timeoutMillis = 3.minutesToMillis) {
@@ -198,13 +216,15 @@ fun Bot.seTu() {
             }
         }
 
-//        val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
-//        has<Image> {
-//            if (message[Image]?.imageId == seTuCome) {
-//                reply("!警告: 这是实验性功能, 存在未经审查的图片")
-//                getSeTu()
-//            }
-//        }
+        val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
+        has<Image> {
+            if (it.imageId == seTuCome) seTuEmission(null)
+        }
+
+        Regex("""\s*来点.*色图\s*""") matching {
+            val keyword = it.trim().substringAfter("来点").substringBefore("色图")
+            if (keyword.isNotEmpty()) seTuEmission(keyword)
+        }
 
         Regex("""\s*动[画漫][识搜]图\s*""") matching {
             reply("请发送你要搜索的动画截图")
