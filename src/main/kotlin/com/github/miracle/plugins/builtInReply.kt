@@ -2,6 +2,7 @@ package com.github.miracle.plugins
 
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.data.LightApp
 
 fun Bot.builtInReply() {
     subscribeGroupMessages {
@@ -17,7 +18,7 @@ fun Bot.builtInReply() {
         }
 
         "草" reply {
-            listOf("草", "草", "草", "草", "").random()
+            listOf("草", "", "", "", "").random()
         }
 
         contains("机屑人") {
@@ -26,6 +27,10 @@ fun Bot.builtInReply() {
                     reply(it)
                 }
             }
+        }
+
+        startsWith(".json", removePrefix = true, trim = true) {
+            LightApp(it).send()
         }
     }
 }
