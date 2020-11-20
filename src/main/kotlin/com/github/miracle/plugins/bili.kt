@@ -177,7 +177,7 @@ fun Bot.bili() {
         }
     }
 
-    suspend fun Bot.sendBiliLive(groupId: List<Long>, model: BiliLiveModel) {
+    suspend fun Bot.sendBiliLive(bid: Long, groupId: List<Long>, model: BiliLiveModel) {
         groupId.forEach {
             val bi = model.data.anchorInfo.baseInfo
             val ri = model.data.roomInfo
@@ -194,6 +194,7 @@ fun Bot.bili() {
                     buildMessageChain {
                         add(stream.uploadAsImage(contact))
                         add("${ri.title} / ${bi.uname}\n")
+                        add("https://live.bilibili.com/$bid\n")
                         add("直播开始时间: ${timeElapsed.seconds}秒 前")
                     }.sendTo(contact)
                     delay(2000)
@@ -218,7 +219,7 @@ fun Bot.bili() {
             if (live) {
                 if (cache[bid] != true) {
                     BiliSubData.markLiving(bid)
-                    sendBiliLive(groupId, model)
+                    sendBiliLive(bid, groupId, model)
                 }
             } else {
                 if (cache[bid] != false) BiliSubData.markUnliving(bid)
