@@ -9,13 +9,13 @@ import java.awt.image.BufferedImage
 const val IMG_WIDTH = 1080
 const val MARGIN = 40
 
-class GenerateTextPic(val text: String, val authorName: String) {
+class GenerateTextPic(text: String, private val authorName: String) {
     val cFont = Font("楷体", Font.PLAIN, 54)
-    val lineHeight = FontDesignMetrics.getMetrics(cFont).height + 10
+    private val lineHeight = FontDesignMetrics.getMetrics(cFont).height + 10
     var lines = text.split("\n", "\r", "\r\r")
-    val noExtraLines = emptyList<String>().toMutableList()
+    private val noExtraLines = emptyList<String>().toMutableList()
 
-    fun removeExtraEmpty() {
+    private fun removeExtraEmpty() {
         lines.forEach {
             if (!(it.isEmpty() && noExtraLines.last().isEmpty())) {
                 noExtraLines.add(it)

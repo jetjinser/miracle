@@ -41,7 +41,7 @@ fun Bot.saveMsg() {
                     reply(tempMergeString)
                 } else {
                     // 文字太长，进行截取
-                    var partCount = tempMergeString.length / 4000 + 1
+                    val partCount = tempMergeString.length / 4000 + 1
                     for (i in 0 until partCount) {
                         val endIndex =
                             if ((i + 1) * 4000 < tempMergeString.length - 1) (i + 1) * 4000 else tempMergeString.length - 1
