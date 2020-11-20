@@ -6,12 +6,16 @@ class Helper(pluginName: String) {
     companion object {
         val antiLightAppDesc = """[AntiLightApp]
             |自动识别群聊消息中的小程序, 解析小程序并以一般的图文消息发送
+            |   > 或许该在消息中添加更多的内容
         """.trimMargin()
         val bili = """[Bili]
             |自动识别群聊消息中的av/BV/cv号, 并返回相应的详细信息
             |可用指令:
             |  - 提取封面 <av 或 BV>
             |       用于提取b站视频的封面
+            |  - b订阅 <房间号> / b取订 <房间号> / b订阅列表
+            |       用于订阅bilibili直播, 订阅后会在该直播间直播时推送到群内
+            |       房间号可见对应主播直播间的url
         """.trimMargin()
         val builtInReply = """[BuiltInReply]
             |一些内置回复
@@ -62,6 +66,7 @@ class Helper(pluginName: String) {
         """.trimMargin()
         val music = """[Music]
             |点歌, 目前支持: 网易云, 酷狗
+            |被一切障碍摧毁了
             |可用指令:
             |  - [网易云/酷狗]点歌 <歌名>
             |       消费 50 铜币 @see CheckIn
@@ -77,19 +82,18 @@ class Helper(pluginName: String) {
             |       抽签的内容需要用空格隔开, 如 `抽签 起床 睡觉`
         """.trimMargin()
         val reaction = """[Reaction]
-            |识别群内变化做出的响应
-            |如匿名设置发生变化时会发消息
             |新群友入群时主动欢迎
-            | > 并没有什么用, 考虑后续更新中取消或添加开关
+            | > 后续更新中或许会取消或添加开关 / 自定义欢迎的消息
         """.trimMargin()
         val remind = """[Remind]
             |自定义的定时(延时)提醒
             |可用指令:
             |  - <数字><分/时/.../秒>后提醒我<做什么>
-            |       如 `三分钟后提醒我起床`, `三天后提醒我交作业`, "后提醒我" 是必须的. 不稳定, 在bot更新/重启后会被取消, 在后续更新中会修复 
+            |       如 `三分钟后提醒我起床`, `三天后提醒我交作业`, "后提醒我" 是必须的. 不稳定, 在bot更新/重启后会被取消, 在后续更新中(或许)会修复 
         """.trimMargin()
         val scheduler = """[Scheduler]
             |定点消息, 六点时会发送 `早`, 十二点时会发送 `🕛`
+            |(暂时废弃)
         """.trimMargin()
         val setting = """[Setting]
             |还没写完
