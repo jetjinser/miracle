@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
+import net.mamoe.mirai.event.events.BotJoinGroupEvent
+import net.mamoe.mirai.event.events.BotLeaveEvent
 import net.mamoe.mirai.event.events.MemberJoinEvent
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.getFriendOrNull
@@ -20,6 +22,22 @@ fun Bot.reaction() {
     subscribeAlways<MemberJoinEvent> {
         group.sendMessage("欢迎")
         // TODO 自定义
+    }
+
+    subscribeAlways<BotLeaveEvent.Kick> {
+        getFriendOrNull(owner)?.sendMessage(
+            "已被 ${operator.nameCard}(${operator.id}) 踢出群 ${group.name}(${group.id})"
+        )
+    }
+
+    subscribeAlways<BotLeaveEvent.Active> {
+        getFriendOrNull(owner)?.sendMessage(
+            "已离开群 ${group.name}(${group.id})"
+        )
+    }
+
+    subscribeAlways<BotJoinGroupEvent> {
+        group.sendMessage("大家好")
     }
 
     subscribeAlways<BotInvitedJoinGroupRequestEvent>(priority = Listener.EventPriority.HIGH) {
