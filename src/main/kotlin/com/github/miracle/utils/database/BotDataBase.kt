@@ -81,4 +81,9 @@ object BotDataBase {
         val roomId = long("room_id").primaryKey()
         val uname = varchar("uname")
     }
+    object NovelSubscription : Table<Nothing>("NovelSubscription") {
+        val groupId = long("group_id").primaryKey()
+        val novelId = long("novel_id").primaryKey()
+        val title = varchar("title")
+    }
 }
