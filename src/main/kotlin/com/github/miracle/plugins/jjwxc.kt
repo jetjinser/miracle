@@ -10,24 +10,23 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.sendTo
-import net.mamoe.mirai.utils.secondsToMillis
 import java.util.*
 import kotlin.concurrent.schedule
 
 fun Bot.jjwxc() {
-    subscribeGroupMessages { // bilibili 订阅 region
+    eventChannel.subscribeGroupMessages { // bilibili 订阅 region
         Regex("""\s*j订阅 +\w+\s*""") matching regex@{
             val msg = it.substringAfter("j订阅").trim()
             if (msg.isEmpty()) return@regex
             val nid = msg.toLongOrNull()
             if (nid == null) {
-                reply("小说id是数字喔")
+                subject.sendMessage("小说id是数字喔")
                 return@regex
             } else {
                 val novel = Jjwxc.getNovelInfo(nid)
                 if (novel == null) {
                     // 不存在
-                    reply("订阅失败, 请确认小说id正确")
+                    subject.sendMessage("订阅失败, 请确认小说id正确")
                     return@regex
                 } else {
                     // 0: 连载中 1: 已完结 2: 不存在
@@ -37,19 +36,19 @@ fun Bot.jjwxc() {
                                 // 已经插入到数据库里了
                                 // 标记最新一章
                                 NovelSubData.markLastChapter(nid, novel.chapterId)
-                                reply(
+                                subject.sendMessage(
                                     "${novel.title} : ${nid}\n订阅成功\n最新章节：第${novel.chapterId}章\n" +
                                             "${novel.chapterTitle}:${novel.chapterDesc}"
                                 )
                             } else {
-                                reply("你已经订阅过了: $nid")
+                                subject.sendMessage("你已经订阅过了: $nid")
                             }
                         }
                         1 -> {
-                            reply("该小说已完结")
+                            subject.sendMessage("该小说已完结")
                         }
                         2 -> {
-                            reply("订阅失败, 请确认小说id正确")
+                            subject.sendMessage("订阅失败, 请确认小说id正确")
                         }
                     }
                 }
@@ -59,9 +58,9 @@ fun Bot.jjwxc() {
         case("j订阅列表") {
             val list = NovelSubData.getSubList(group.id)
             if (list == null) {
-                reply("本群还没有订阅")
+                subject.sendMessage("本群还没有订阅")
             } else {
-                reply(
+                subject.sendMessage(
                     list.joinToString("\n") {
                         "${it.first.toString().padEnd(8, ' ')} - ${it.second}"
                     }
@@ -74,11 +73,11 @@ fun Bot.jjwxc() {
             if (msg.isEmpty()) return@regex
             val nid = msg.toLongOrNull()
             if (nid == null) {
-                reply("小说id是数字喔")
+                subject.sendMessage("小说id是数字喔")
                 return@regex
             } else {
                 val success = NovelSubData.unsubscribe(group.id, nid)
-                if (success) reply("取订成功: $nid") else reply("你没有订阅过这本小说")
+                if (success) subject.sendMessage("取订成功: $nid") else subject.sendMessage("你没有订阅过这本小说")
             }
         }
     }
@@ -87,7 +86,7 @@ fun Bot.jjwxc() {
         groupId.forEach {
             coroutineScope {
                 launch {
-                    val contact = getGroup(it)
+                    val contact = getGroupOrFail(it)
                     buildMessageChain {
                         add("${model.title} 更新了第${model.chapterId}章\n")
                         add("${model.chapterTitle}:${model.chapterDesc}\n")
@@ -98,7 +97,7 @@ fun Bot.jjwxc() {
         }
     }
 
-    Timer().schedule(Date(), 20.secondsToMillis) {
+    Timer().schedule(Date(), 20000) {
         val pair = NovelSubData.nextSub()
         launch {
             val novelMap = pair.first // nid: list(gid)

@@ -7,13 +7,13 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.subscribeFriendMessages
 import net.mamoe.mirai.event.subscribeGroupMessages
-import net.mamoe.mirai.message.MessageEvent
 import net.mamoe.mirai.message.data.At
-import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.content
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.TulingPostModel
 import com.github.miracle.utils.network.model.TulingRecvModel
+import net.mamoe.mirai.event.events.MessageEvent
+import net.mamoe.mirai.message.data.toMessageChain
 
 fun Bot.tuling() {
     suspend fun MessageEvent.tulingReply(s: String) {
@@ -56,19 +56,19 @@ fun Bot.tuling() {
                 continue
             }
 
-            reply(if (msg.isNotEmpty()) msg.dropLast(1) else "?")
+            subject.sendMessage(if (msg.isNotEmpty()) msg.dropLast(1) else "?")
             break
         }
     }
 
-    subscribeGroupMessages(priority = EventPriority.MONITOR) {
+    eventChannel.subscribeGroupMessages(priority = EventPriority.MONITOR) {
         has<At> { at ->
             if (at.target != bot.id) return@has
-            tulingReply(message.drop(2).asMessageChain().content)
+            tulingReply(message.drop(2).toMessageChain().content)
         }
     }
 
-    subscribeFriendMessages {
+    eventChannel.subscribeFriendMessages {
         always {
             tulingReply(message.content)
         }

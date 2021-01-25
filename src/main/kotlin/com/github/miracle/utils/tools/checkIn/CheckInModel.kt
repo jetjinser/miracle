@@ -2,7 +2,7 @@ package com.github.miracle.utils.tools.checkIn
 
 import com.github.miracle.utils.data.CheckInData
 import com.github.miracle.utils.data.TipsData
-import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.event.events.GroupMessageEvent
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
