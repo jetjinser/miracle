@@ -6,7 +6,7 @@ import com.github.miracle.utils.data.GroupSettingDataMap
 import java.lang.NumberFormatException
 
 fun Bot.setting() {
-    subscribeGroupMessages {
+    eventChannel.subscribeGroupMessages {
         // 临时 懒得写
     }
 }

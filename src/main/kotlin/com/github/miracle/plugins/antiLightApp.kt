@@ -8,10 +8,12 @@ import net.mamoe.mirai.message.data.LightApp
 import net.mamoe.mirai.message.data.buildMessageChain
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.AntiLightAppModel
+import net.mamoe.mirai.message.data.sendTo
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 
 
 fun Bot.antiLightApp() {
-    subscribeGroupMessages {
+    eventChannel.subscribeGroupMessages {
         has<LightApp> {
             val client = KtorClient.getInstance() ?: return@has
             val model: AntiLightAppModel
@@ -35,12 +37,11 @@ fun Bot.antiLightApp() {
 
             val detail = model.meta.detail
             val doCurl: String? = model.meta.detail.qqDoCurl?.split("?")?.first()
-
             buildMessageChain {
                 add("@${detail.title}\n")
-                add(byteArray.inputStream().uploadAsImage())
+                add(byteArray.inputStream().uploadAsImage(getGroupOrFail(group.id)))
                 add("${detail.desc}\n${doCurl ?: "无法获取链接: ${detail.title}不支持或版本过低"}\nvia antiLightApp")
-            }.send()
+            }.sendTo(subject)
         }
     }
 }

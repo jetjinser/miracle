@@ -5,6 +5,7 @@ import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.tools.translate.ScriptInvocable
 import io.ktor.client.request.*
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.*
@@ -16,21 +17,21 @@ private fun CharSequence.isContainChinese(): Boolean {
 }
 
 fun Bot.translate() {
-    subscribeGroupMessages(priority = Listener.EventPriority.LOWEST) {
+    eventChannel.subscribeGroupMessages(priority = EventPriority.LOWEST) {
         Regex("""(?i).*(翻译|fanyi|translate).*""") matching regex@{
-            val at = message[At]
-            if (at != null) if (!at.isBot()) return@regex
+            val at = message[MessageSource.Key]
+            if (at != null) if (at.targetId != bot.id) return@regex
 
-            val m = message.filter { it.isPlain() }
-            val first = m.asMessageChain().content
+//            val m = message.filter { it.contentToString() } TODO
+            val first = message.content
 
             var original = Regex("""(?i)翻译|fanyi|translate""").replace(first.trim(), "").trim()
 
             original = if (original.isEmpty()) {
-                reply("你要翻译什么?")
+                subject.sendMessage("你要翻译什么?")
                 intercept()
-                nextMessage(timeoutMillis = TimeUnit.MINUTES.toMillis(3), priority = Listener.EventPriority.HIGH) {
-                    message[PlainText] != null
+                nextMessage(timeoutMillis = TimeUnit.MINUTES.toMillis(3), priority = EventPriority.HIGH) {
+                    message[MessageSource.Key] != null // TODO
                 }.content
             } else original
             val tl = if (original.isContainChinese()) "auto" else "zh-CN"
@@ -43,7 +44,7 @@ fun Bot.translate() {
 
             val client = KtorClient.getInstance() ?: return@regex
             val resp = client.get<String>(gTranslateUrl)
-            reply(resp.substringAfter("\"").substringBefore("\""))
+            subject.sendMessage(resp.substringAfter("\"").substringBefore("\""))
         }
     }
 }

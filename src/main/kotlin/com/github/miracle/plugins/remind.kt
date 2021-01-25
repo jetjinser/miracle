@@ -5,20 +5,22 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.content
 import java.util.*
 import kotlin.concurrent.schedule
 
 fun Bot.remind() {
     val timer = Timer()
 
-    subscribeGroupMessages {
+    eventChannel.subscribeGroupMessages {
         contains("后提醒我") {
-            val msg = message[PlainText]?.content ?: return@contains
+            val msg = message[MessageSource.Key]?.content ?: return@contains
 
             val result = Regex("""(?<date>.*后)\s*提醒我(?<something>.*)""").matchEntire(msg)
             if (result == null) {
-                reply("格式错误")
+                subject.sendMessage("格式错误")
                 return@contains
             }
 
@@ -28,15 +30,15 @@ fun Bot.remind() {
 
             val delayDate = RemindDate.getDate(date)
             if (delayDate == null) {
-                reply("单位不支持或时间为0, 请注意, 过大的数字会导致溢出, 使时间错误")
+                subject.sendMessage("单位不支持或时间为0, 请注意, 过大的数字会导致溢出, 使时间错误")
             }
 
             val delay = delayDate?.time?.minus(System.currentTimeMillis()) ?: return@contains
 
-            reply("好的, 我会在 $preDate 提醒你\n[$something]")
+            subject.sendMessage("好的, 我会在 $preDate 提醒你\n[$something]")
             timer.schedule(delay) {
                 launch {
-                    reply(At(sender) + something)
+                    subject.sendMessage(At(sender) + something)
                 }
             }
         }

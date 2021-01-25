@@ -3,10 +3,10 @@ package com.github.miracle.utils.data
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.message.GroupMessageEvent
 import com.github.miracle.utils.database.BotDataBase
 import com.github.miracle.utils.database.BotDataBase.User
 import com.github.miracle.utils.logger.BotLogger
+import net.mamoe.mirai.event.events.GroupMessageEvent
 
 /**
  * 处理签到的数据

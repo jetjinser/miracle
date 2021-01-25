@@ -3,13 +3,14 @@ package com.github.miracle.plugins
 import com.github.miracle.utils.data.CheckInData
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
-import net.mamoe.mirai.message.code.parseMiraiCode
 import net.mamoe.mirai.message.data.buildMessageChain
 import com.github.miracle.utils.data.GroupSettingDataMap
 import com.github.miracle.utils.data.ThesaurusData
+import net.mamoe.mirai.message.code.MiraiCode.deserializeMiraiCode
+import net.mamoe.mirai.message.data.sendTo
 
 fun Bot.thesaurus() {
-    subscribeGroupMessages {
+    eventChannel.subscribeGroupMessages {
         Regex(""".*添加问.*答.*""") matching regex@{
             Regex(""".*](?<global>(?:全局)?)添加问(?<question>.*)答(?<answer>.*)""").matchEntire(message.toString())?.apply {
                 val globalToken = groupValues[1].trim() == "全局"
@@ -22,19 +23,19 @@ fun Bot.thesaurus() {
                         return@consumeCuprum if (success) {
                             buildMessageChain {
                                 add("${if (globalToken) "全局" else ""}添加成功\nⓆ: [")
-                                add(question.parseMiraiCode())
+                                add(question.deserializeMiraiCode())
                                 add("]\nⒶ: [")
-                                add(answer.parseMiraiCode())
+                                add(answer.deserializeMiraiCode())  // TODO
                                 add("]\n")
                                 add("via thesaurus")
-                            }.send()
+                            }.sendTo(subject)
                             true
                         } else {
-                            reply("添加失败, 已存在相同的问答\nⓆ: [$question]\nⒶ: [$answer]\nvia thesaurus")
+                            subject.sendMessage("添加失败, 已存在相同的问答\nⓆ: [$question]\nⒶ: [$answer]\nvia thesaurus")
                             false
                         }
                     } else {
-                        reply("铜币不足 200 , 添加取消, 铜币可由签到获得\n当前铜币: ${it.second}")
+                        subject.sendMessage("铜币不足 200 , 添加取消, 铜币可由签到获得\n当前铜币: ${it.second}")
                         false
                     }
                 }
@@ -46,7 +47,7 @@ fun Bot.thesaurus() {
             val answerList = thesaurusData.answerList
             if (answerList.isNotEmpty()) {
                 if (thesaurusData.random(GroupSettingDataMap.getInstance(this.group).qaProbability)) {
-                    answerList.random().parseMiraiCode().send()
+                    answerList.random().deserializeMiraiCode(subject).sendTo(subject)
                 }
             }
         }
