@@ -20,9 +20,12 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
         Gaussian
     }
 
-    fun generate(backgroundImageType: BackgroundImageType): BufferedImage {
+    fun generate(backgroundImageType: BackgroundImageType): ByteArray {
         val image = ImageIO.read(URL(url))
-        return compound(image, backgroundImageType)
+        val imgBuffer = compound(image, backgroundImageType)
+        val os = ByteArrayOutputStream()
+        ImageIO.write(imgBuffer, "png", os)
+        return os.toByteArray()
     }
 
     private fun scaleByPercentage(inputImage: BufferedImage): BufferedImage {
