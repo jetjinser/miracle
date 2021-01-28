@@ -15,9 +15,19 @@ fun Bot.help() {
 
     eventChannel.subscribeGroupMessages(priority = EventPriority.LOW) {
         Regex(""".*(帮助|菜单|(?i)help).*""") matching regex@{
-            if (message[MessageSource.Key]?.targetId != bot.id) return@regex
+            var isAt = false
+            var content = ""
+            for (item in message.contentsList()) {
+                if (item is At && item.target == bot.id) {
+                    isAt = true
+                }
+                if (item is PlainText) {
+                    content = item.content
+                }
+            }
+            if (!isAt) return@regex
 
-            val pluginName = message[MessageSource.Key]?.content?.split(" ")?.filter { it.isNotEmpty() }?.getOrNull(1)
+            val pluginName = content.split(" ").filter { it.isNotEmpty() }.getOrNull(1)
 
             if (pluginName == null) {
                 // 直接发送 help

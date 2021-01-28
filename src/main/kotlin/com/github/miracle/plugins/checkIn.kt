@@ -17,8 +17,14 @@ import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.data.sendTo
 import net.mamoe.mirai.message.nextMessage
+import net.mamoe.mirai.utils.ExternalResource
+import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import sun.font.FontDesignMetrics
 import java.awt.Font
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
 
 
 fun Bot.checkIn() {
@@ -27,8 +33,9 @@ fun Bot.checkIn() {
             CheckInModel(this).also {
                 if (it.checkIn()) {
                     val type = listOf(BackgroundImageType.LoyPoly, BackgroundImageType.Gaussian)
+                    val imgBuffer = CheckInPicture(sender.avatarUrl, it).generate(type.random())
                     buildMessageChain {
-                        CheckInPicture(sender.avatarUrl, it).generate(type.random())
+                        add(imgBuffer.toExternalResource().uploadAsImage(subject))
                     }.sendTo(subject)
                 } else {
                     subject.sendMessage("您今天已经签到过了")

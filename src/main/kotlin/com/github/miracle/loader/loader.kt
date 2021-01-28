@@ -28,7 +28,7 @@ suspend fun main() {
         setting()
         music()
         information()
-        tuling()
+//        tuling()
         remind()
 //        scheduler()
         woPay()

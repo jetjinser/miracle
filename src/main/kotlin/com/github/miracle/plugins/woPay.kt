@@ -10,8 +10,7 @@ import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.events.BotJoinGroupEvent
 import net.mamoe.mirai.event.subscribeFriendMessages
 import net.mamoe.mirai.event.subscribeGroupMessages
-import net.mamoe.mirai.message.data.MessageSource
-import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.nextMessage
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -39,9 +38,19 @@ fun Bot.woPay() {
 
     eventChannel.subscribeGroupMessages(priority = EventPriority.LOWEST) {
         contains("token", ignoreCase = true, trim = true) {
-            if (message[MessageSource.Key]?.targetId != bot.id) return@contains
-            var msg = message[MessageSource.Key]?.content?.substringAfter("token")?.trim()
-            if (msg.isNullOrEmpty()) {
+            var isAt = false
+            var content = ""
+            for (item in message.contentsList()) {
+                if (item is At && item.target == bot.id) {
+                    isAt = true
+                }
+                if (item is PlainText) {
+                    content = item.content
+                }
+            }
+            if (!isAt) return@contains
+            var msg = content.substringAfter("token").trim()
+            if (msg.isEmpty()) {
                 subject.sendMessage("请发送token")
                 msg = nextMessage { message[MessageSource.Key] != null }.content.trim() // TODO
             }

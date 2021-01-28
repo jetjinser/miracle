@@ -5,6 +5,8 @@ import java.awt.Color
 import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
 
 const val IMG_WIDTH = 1080
 const val MARGIN = 40
@@ -24,7 +26,7 @@ class GenerateTextPic(text: String, private val authorName: String) {
     }
 
     // 计算图片高度
-    fun createTextPic(): BufferedImage {
+    fun createTextPic(): ByteArray {
         // 宽度1080
         var totalLineCount = 0
         removeExtraEmpty()
@@ -40,7 +42,10 @@ class GenerateTextPic(text: String, private val authorName: String) {
             }
         }
         totalLineCount += 7
-        return drawText(tablet(totalLineCount * lineHeight))
+        val imgBuffer = drawText(tablet(totalLineCount * lineHeight))
+        val os = ByteArrayOutputStream()
+        ImageIO.write(imgBuffer, "png", os)
+        return os.toByteArray()
     }
 
     // 创建图片

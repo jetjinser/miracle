@@ -7,6 +7,8 @@ import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.data.sendTo
+import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 
 fun Bot.saveMsg() {
     var recordId = 0L
@@ -50,7 +52,7 @@ fun Bot.saveMsg() {
                     }
                 }
                 buildMessageChain {
-                    GenerateTextPic(tempMergeString, recordName).createTextPic()
+                    add(GenerateTextPic(tempMergeString, recordName).createTextPic().toExternalResource().uploadAsImage(subject))
                 }.sendTo(subject)
                 recordId = 0L
                 recordName = ""
