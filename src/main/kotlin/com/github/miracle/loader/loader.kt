@@ -24,7 +24,7 @@ suspend fun main() {
         bili()
         button()
         antiLightApp()
-        recode()
+//        recode()
         thesaurus()
         setting()
         music()

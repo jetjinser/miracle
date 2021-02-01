@@ -10,6 +10,7 @@ import com.github.miracle.utils.tools.statistics.UserStatHandle
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.MessageChainBuilder
 import net.mamoe.mirai.message.data.buildMessageChain
@@ -21,6 +22,15 @@ import java.awt.Font
 
 
 fun Bot.checkIn() {
+    subscribeOwnerMessage {
+        case("测试") {
+            CheckInPicture(
+                sender.avatarUrl,
+                CheckInModel(this as GroupMessageEvent)
+            ).generate(BackgroundImageType.LoyPoly).send()
+        }
+    }
+
     subscribeGroupMessages {
         case("签到", trim = true) {
             CheckInModel(this).also {

@@ -18,7 +18,7 @@ fun Bot.builtInReply() {
         }
 
         "草" reply {
-            listOf("草", "", "", "", "").random()
+            listOf("草", "", "", "", "").random().ifEmpty { return@ifEmpty }
         }
 
         contains("机屑人") {
