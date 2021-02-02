@@ -5,14 +5,14 @@ import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.LightApp
 
 fun Bot.builtInReply() {
-    subscribeGroupMessages {
+    eventChannel.subscribeGroupMessages {
         Regex("""\s*来?嘤(一[个下])?\s*""") matchingReply { "嘤嘤嘤" }
         Regex("""\s*来?喵(一[个下])?\s*""") matchingReply { "喵喵喵" }
         Regex("""\s*((wei)?[,， ])? *zaima\??\s*""") matchingReply { "buzai,cnm" }
         Regex("""\s*你好|泥嚎\s*""") matching {
             listOf("泥嚎,我很阔爱,请给我钱", "").random().let {
                 if (it != "") {
-                    reply(it)
+                    subject.sendMessage(it)
                 }
             }
         }
@@ -24,13 +24,13 @@ fun Bot.builtInReply() {
         contains("机屑人") {
             listOf("你才是机屑人", "", "", "").random().let {
                 if (it != "") {
-                    reply(it)
+                    subject.sendMessage(it)
                 }
             }
         }
 
         startsWith(".json", removePrefix = true, trim = true) {
-            LightApp(it).send()
+            subject.sendMessage(LightApp(it))
         }
     }
 }

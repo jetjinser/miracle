@@ -5,11 +5,11 @@ import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.content
 
 fun Bot.random() {
-    subscribeGroupMessages {
-        startsWith("随机数", removePrefix = true, trim = true) { reply(randomNumber(message.content)) }
+    eventChannel.subscribeGroupMessages {
+        startsWith("随机数", removePrefix = true, trim = true) { subject.sendMessage(randomNumber(message.content)) }
 
         startsWith("打乱", removePrefix = true, trim = true) {
-            reply(
+            subject.sendMessage(
                 message.content
                     .split(" ")
                     .filter { it.isNotEmpty() }
@@ -19,10 +19,10 @@ fun Bot.random() {
 
         startsWith("抽签") {
             if (message.content.isEmpty()) {
-                reply("格式错误，需要提供要抽签的内容")
+                subject.sendMessage("格式错误，需要提供要抽签的内容")
                 return@startsWith
             }
-            reply(
+            subject.sendMessage(
                 message.content
                     .split(" ")
                     .filter { it.isNotEmpty() }

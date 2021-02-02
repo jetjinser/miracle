@@ -2,13 +2,12 @@ package com.github.miracle.loader
 
 import com.github.miracle.SecretConfig
 import com.github.miracle.plugins.*
-import net.mamoe.mirai.Bot
+import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.alsoLogin
-import net.mamoe.mirai.join
 
 
 suspend fun main() {
-    val bot = Bot(
+    val bot = BotFactory.newBot(
         SecretConfig.qq,
         SecretConfig.password
     ) {
@@ -29,14 +28,19 @@ suspend fun main() {
         setting()
         music()
         information()
-        tuling()
+//        tuling()
         remind()
 //        scheduler()
         woPay()
         help()
         manage()
         translate()
+        saveMsg()
+        jjwxc()
+        flomo()
     }
+
+
 
     bot.join()
 }

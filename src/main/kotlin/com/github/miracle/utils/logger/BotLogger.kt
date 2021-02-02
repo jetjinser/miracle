@@ -1,7 +1,8 @@
 package com.github.miracle.utils.logger
 
-import net.mamoe.mirai.utils.DefaultLogger
+import net.mamoe.mirai.utils.SimpleLogger
 
 object BotLogger {
-    fun logger(identity: String) = DefaultLogger.invoke(identity)
+    fun logger(identity: String) = SimpleLogger.invoke(identity) { _, _ ->
+    }
 }

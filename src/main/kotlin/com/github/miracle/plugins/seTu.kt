@@ -16,14 +16,12 @@ import io.ktor.network.sockets.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.subscribeGroupMessages
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.code.parseMiraiCode
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.nextMessage
-import net.mamoe.mirai.message.recallIn
-import net.mamoe.mirai.utils.minutesToMillis
-import net.mamoe.mirai.utils.secondsToMillis
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import java.io.InputStream
 import java.text.DecimalFormat
 
@@ -32,16 +30,16 @@ fun Bot.seTu() {
         val checkInData = CheckInData(this)
 
         if (checkInData.favor ?: 0 <= 50) {
-            reply("不！我不喜欢你")
+            subject.sendMessage("不！我不喜欢你")
             return
         }
 
         checkInData.consumeCuprum(100) { pair ->
             return@consumeCuprum if (!pair.first) {
-                reply("铜币不足 100 , 获取色图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+                subject.sendMessage("铜币不足 100 , 获取色图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
                 false
             } else {
-                reply("少女祈祷中")
+                subject.sendMessage("少女祈祷中")
 
                 val client = KtorClient.getInstance() ?: return@consumeCuprum false
 
@@ -54,13 +52,13 @@ fun Bot.seTu() {
 
                 if (response.status.value == 429) {
                     logger.info("达到请求上限: ${model.quotaMinTtl}s 后恢复")
-                    reply("达到请求上限, 距离下一次调用额度恢复还有 ${model.quotaMinTtl}s")
+                    subject.sendMessage("达到请求上限, 距离下一次调用额度恢复还有 ${model.quotaMinTtl}s")
                     return@consumeCuprum false
                 }
 
                 val data = model.data.also {
                     if (it.isEmpty()) {
-                        reply("关键字 [$keyword] 没有结果")
+                        subject.sendMessage("关键字 [$keyword] 没有结果")
                         return@consumeCuprum false
                     }
                 }.first()
@@ -69,20 +67,20 @@ fun Bot.seTu() {
                     val imageResponse = client.get<HttpResponse>(data.url)
 
                     if (imageResponse.status.value == 200) {
-                        quoteReply(
+                        QuoteReply(buildMessageChain {
                             "title: ${data.title}\nauthor: ${data.author}\n" +
                                     "tags: ${data.tags.joinToString(", ")}\nhttps://www.pixiv.net/artworks/${data.pid}"
-                        )
-                        imageResponse.receive<InputStream>().uploadAsImage()
-                            .send().recallIn(75.secondsToMillis)
+                        }).sendTo(subject)
+                        imageResponse.receive<InputStream>().uploadAsImage(subject)
+                            .sendTo(subject).recallIn(75000)
                         return@consumeCuprum true
                     } else {
-                        reply("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
+                        subject.sendMessage("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
                         logger.warning("${data.url} 下载失败")
                         return@consumeCuprum false
                     }
                 } catch (e: ConnectTimeoutException) {
-                    reply("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
+                    subject.sendMessage("[下载失败]\n${data.url}\npid: ${data.pid}\nuid: ${data.uid}")
                     logger.warning("${data.url} 下载失败")
                     return@consumeCuprum false
                 }
@@ -94,11 +92,11 @@ fun Bot.seTu() {
     suspend fun GroupMessageEvent.searchSeTu(imageUrl: String) {
         val pair = CheckInData(this).consumeCuprum(100)
         if (!pair.first) {
-            reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+            subject.sendMessage("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
             return
         }
 
-        reply("少女祈祷中")
+        subject.sendMessage("少女祈祷中")
         val url =
             "https://saucenao.com/search.php?output_type=2&api_key=$sauceNaoApiKey&numres=1&url=$imageUrl"
 
@@ -125,11 +123,11 @@ fun Bot.seTu() {
 
             buildMessageChain {
                 if (imageResponse.status.value == 404) {
-                    reply("這個作品可能已被刪除，或無法取得。\n該当作品は削除されたか、存在しない作品IDです。")
+                    subject.sendMessage("這個作品可能已被刪除，或無法取得。\n該当作品は削除されたか、存在しない作品IDです。")
                     logger.info("图片不存在")
                     add(catPixiv)
                 } else {
-                    add(imageResponse.receive<InputStream>().uploadAsImage())
+                    add(imageResponse.receive<InputStream>().uploadAsImage(subject))
                     logger.info("pixiv.cat 图片下载成功")
                 }
                 add(
@@ -138,21 +136,21 @@ fun Bot.seTu() {
                 )
                 add(ps)
                 add("via SauceNao")
-            }.send()
+            }.sendTo(subject)
             // Exception in thread "main" java.lang.NoClassDefFoundError: com/sun/javaws/exceptions/MissingFieldException
         } catch (e: Exception) {
-            reply("不存在或暂不支持的返回, 后续逐步更新迭代将会解决")
+            subject.sendMessage("不存在或暂不支持的返回, 后续逐步更新迭代将会解决")
         }
     }
 
     suspend fun GroupMessageEvent.searchAnimation(imageUrl: String) {
         val pair = CheckInData(this).consumeCuprum(100)
         if (!pair.first) {
-            reply("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
+            subject.sendMessage("铜币不足 100 , 识图取消, 铜币可由签到获得\n当前铜币: ${pair.second}")
             return
         }
 
-        reply("少女祈祷中")
+        subject.sendMessage("少女祈祷中")
         val client = KtorClient.getInstance() ?: return
 
         val url = "https://trace.moe/api/search?url=$imageUrl"
@@ -162,7 +160,7 @@ fun Bot.seTu() {
 
         if (response.status.value == 429) {
             logger.info("达到请求上限: ${searchModel.limitTtl}s 后恢复")
-            reply(
+            subject.sendMessage(
                 "达到请求上限, 距离下一次调用额度恢复还有 ${searchModel.limit}s, 恢复后有10次请求额度\n" +
                         "总共还有 ${searchModel.quota} 次调用额度, ${searchModel.quotaTtl}s 后恢复"
             )
@@ -180,7 +178,7 @@ fun Bot.seTu() {
         buildMessageChain {
             if (!doc.isAdult) {
                 val imageStream = client.get<ByteArray>(infoModel.coverImage.large)
-                add(imageStream.inputStream().uploadAsImage())
+                add(imageStream.inputStream().uploadAsImage(subject))
             } else add("成人向, 不显示图片\n")
 
             add("${doc.title} / ${doc.titleChinese} #${doc.episode}\n")
@@ -188,13 +186,13 @@ fun Bot.seTu() {
             add("$desc...")
             add("\nhttps://anilist.co/anime/${doc.aniListId}\n")
             add("via TraceMoe")
-        }.send()
+        }.sendTo(subject)
     }
 
-    subscribeGroupMessages {
+    eventChannel.subscribeGroupMessages {
         Regex("""\s*[pP][识搜]图\s*""") matching {
-            reply("请发送你要搜索的二次元图片")
-            val messageChain = nextMessage(timeoutMillis = 3.minutesToMillis) {
+            subject.sendMessage("请发送你要搜索的二次元图片")
+            val messageChain = nextMessage(timeoutMillis = 3000) {
                 message[Image] != null
             }
             messageChain[Image]?.queryUrl()?.let {
@@ -203,17 +201,17 @@ fun Bot.seTu() {
         }
 
         has<QuoteReply> { reply ->
-            if (Regex(""".*[pP][识搜]图\s*""").matches(message.content)) {
-                val msg = messageCache?.get(reply.source.id)
-                val messageChain = msg?.parseMiraiCode()
-                val image = messageChain?.get(Image)?.queryUrl()
-                if (image != null) searchSeTu(image) else reply("无法获取到图片, 请直接使用指令 [p识图]")
-            } else if (Regex(""".*动[画漫][识搜]图\s*""").matches(message.content)) {
-                val msg = messageCache?.get(reply.source.id)
-                val messageChain = msg?.parseMiraiCode()
-                val image = messageChain?.get(Image)?.queryUrl()
-                if (image != null) searchAnimation(image) else reply("无法获取到图片, 请直接使用指令 [动画识图]")
-            }
+//            if (Regex(""".*[pP][识搜]图\s*""").matches(message.content)) {
+//                val msg = messageCache?.get(reply.source.hashCode())
+//                val messageChain = msg?.parseMiraiCode()
+//                val image = messageChain?.get(Image)?.queryUrl()
+//                if (image != null) searchSeTu(image) else subject.sendMessage("无法获取到图片, 请直接使用指令 [p识图]")
+//            } else if (Regex(""".*动[画漫][识搜]图\s*""").matches(message.content)) {
+//                val msg = messageCache?.get(reply.source.id)
+//                val messageChain = msg?.parseMiraiCode()
+//                val image = messageChain?.get(Image)?.queryUrl()
+//                if (image != null) searchAnimation(image) else subject.sendMessage("无法获取到图片, 请直接使用指令 [动画识图]")
+//            }
         }
 
         val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
@@ -227,8 +225,8 @@ fun Bot.seTu() {
         }
 
         Regex("""\s*动[画漫][识搜]图\s*""") matching {
-            reply("请发送你要搜索的动画截图")
-            val messageChain = nextMessage(timeoutMillis = 3.minutesToMillis) {
+            subject.sendMessage("请发送你要搜索的动画截图")
+            val messageChain = nextMessage(timeoutMillis = 3000) {
                 message[Image] != null
             }
             messageChain[Image]?.queryUrl()?.let {
