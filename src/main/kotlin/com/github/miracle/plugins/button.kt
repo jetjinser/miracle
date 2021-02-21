@@ -19,6 +19,7 @@ fun Bot.button() {
     val aquaFileList = traverseFileTree("button/aqua_voices")
     val meaFileList = traverseFileTree("button/mea_voices")
     val judyFileList = traverseFileTree("button/judy_voices")
+    val qywyFileList = traverseFileTree("button/qywy_voices")
 
     eventChannel.subscribeGroupMessages {
         Regex("""\s*(?:夸(?:叫|按钮))|(?:aqua +button)\s*""") matching {
@@ -36,6 +37,12 @@ fun Bot.button() {
         }
         Regex("""\s*((?:Judy|朱迪|朱)(?:叫|按钮))|(?:mea +button)\s*""") matching {
             val inputStream = judyFileList.random().inputStream()
+            inputStream.use { inp ->
+                subject.sendMessage(inp.toExternalResource().uploadAsVoice(subject))
+            }
+        }
+        Regex("温温温|绝绝绝") matching  {
+            val inputStream = qywyFileList.random().inputStream()
             inputStream.use { inp ->
                 subject.sendMessage(inp.toExternalResource().uploadAsVoice(subject))
             }
