@@ -127,7 +127,8 @@ fun Bot.jjwxc() {
 
             val model = getNovelInfo(nid) ?: return@launch
 
-            if (chapterCache[nid] != 0 && model.chapterId > chapterCache[nid] ?: 0) {
+            println("n:${model.title}, chapterchache:${chapterCache[nid]}")
+            if (chapterCache[nid] != 0 && chapterCache[nid] != null && model.chapterId > chapterCache[nid] ?: 0) {
                 sendNovelUpdate(groupIdList, model)
             }
             NovelSubCache.markLastChapter(nid, model.chapterId)

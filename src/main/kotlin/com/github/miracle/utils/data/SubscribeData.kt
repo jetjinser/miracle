@@ -2,7 +2,6 @@ package com.github.miracle.utils.data
 
 import com.github.miracle.utils.database.BotDataBase
 import com.github.miracle.utils.database.BotDataBase.Subscription
-import com.github.miracle.utils.database.BotDataBase.Platform.JJWXC
 import com.github.miracle.utils.logger.BotLogger
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
@@ -14,41 +13,29 @@ import org.sqlite.SQLiteException
 object SubscribeData {
     private val dataBase: Database? = BotDataBase.getInstance()
     private val logger = BotLogger.logger("BSD")
-    val novelSubQueue by lazy {
-        loadSubQueue(JJWXC)
-    }
 
     init {
         logger.info("SubData initialized")
-    }
-
-    fun getQueue(platform: Int): MutableMap<Long, MutableList<Long>> {
-        return when (platform) {
-            0 -> mutableMapOf<Long, MutableList<Long>>()
-            1 -> novelSubQueue
-            else -> mutableMapOf<Long, MutableList<Long>>()
-        }
     }
 
     /**
      * 根据platform取该平台的订阅列表：
      * Return: Map<订阅id，订阅该id的所有群号>
      */
-    fun loadSubQueue(platform: Int): MutableMap<Long, MutableList<Long>> {
+    fun getSubQueue(platform: Int): MutableMap<Long, MutableList<Long>> {
         val result = mutableMapOf<Long, MutableList<Long>>()
         if (dataBase == null) {
             throw NullPointerException()
         } else {
-            dataBase.from(BotDataBase.Subscription)
-                .select(BotDataBase.Subscription.objectId, BotDataBase.Subscription.groupId).where {
-                    BotDataBase.Subscription.platform eq platform
+            dataBase.from(Subscription)
+                .select(Subscription.objectId, Subscription.groupId).where {
+                    Subscription.platform eq platform
                 }
                 .forEach { queryRowSet ->
-                    val objId = queryRowSet[BotDataBase.Subscription.objectId]
-                    val groupIds = queryRowSet[BotDataBase.Subscription.groupId]
+                    val objId = queryRowSet[Subscription.objectId]
+                    val groupIds = queryRowSet[Subscription.groupId]
                     if (objId != null && groupIds != null) {
                         result[objId] = mutableListOf(groupIds)
-//                        novelUpdateCache[objId] = 0
                     }
                 }
             return result
@@ -63,16 +50,17 @@ object SubscribeData {
             false
         } else {
             try {
-                dataBase.insert(BotDataBase.Subscription) {
+                dataBase.insert(Subscription) {
                     it.groupId to groupId
                     it.objectId to objectId
                     it.title to title
                     it.platform to platform
                 }
                 // 将第一个订阅该obj的群号加入queue中
-                val mutableList = getQueue(platform)[objectId]
+                val queue = getSubQueue(platform)
+                val mutableList = queue[objectId]
                 if (mutableList == null) {
-                    getQueue(platform)[objectId] = mutableListOf(groupId)
+                    queue[objectId] = mutableListOf(groupId)
                 } else {
                     mutableList.add(groupId)
                 }
