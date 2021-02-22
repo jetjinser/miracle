@@ -2,7 +2,7 @@ package com.github.miracle.plugins
 
 import com.github.miracle.SecretConfig
 import com.github.miracle.utils.data.WoPayData
-import com.github.miracle.utils.tools.timer.calendarGen
+import com.github.miracle.utils.tools.timer.timeStart
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
@@ -23,7 +23,7 @@ fun Bot.woPay() {
         WoPayData.register(group.id, LocalDate.now().toString())
     }
 
-    Timer().schedule(calendarGen(4).time) {
+    Timer().schedule(timeStart(4).time) {
         for (group in this@woPay.groups) {
             val date = LocalDate.parse(WoPayData.inquire(group.id), DateTimeFormatter.ISO_DATE)
             if (date.isBefore(LocalDate.now())) {
