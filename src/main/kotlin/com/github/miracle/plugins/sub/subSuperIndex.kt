@@ -104,7 +104,6 @@ fun Bot.subSuperIndex() {
                     client?.let {
                         if (model.status == 0) {
                             model.result.forEach { model ->
-                                println(model)
                                 if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
                                     buildMessageChain {
                                         add("${model.content}\n")
