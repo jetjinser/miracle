@@ -23,6 +23,7 @@ repositories {
     maven {
         url "https://maven.aliyun.com/nexus/content/groups/public/"
     }
+    maven { url = uri("https://dl.bintray.com/karlatemp/misc") }
 }
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
@@ -36,6 +37,7 @@ dependencies {
     // mirai
     implementation "net.mamoe:mirai-core-api:2.3.2"
     implementation "net.mamoe:mirai-core:2.3.2"
+    runtimeOnly("net.mamoe:mirai-login-solver-selenium:1.0-dev-16")
 
     // The needs of the bot
     implementation("io.ktor:ktor-client-serialization:1.4.0")
