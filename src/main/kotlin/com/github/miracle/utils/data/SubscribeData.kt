@@ -79,7 +79,6 @@ object SubscribeData {
      * 取消订阅
      */
     fun unsubscribe(groupId: Long, objId: String, platform: Int): Boolean {
-        println("groupid:$groupId, objId:$objId, platform:$platform")
         val effects = dataBase?.delete(Subscription) {
             (it.platform eq platform) and
             (it.groupId eq groupId) and

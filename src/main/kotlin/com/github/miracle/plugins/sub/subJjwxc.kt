@@ -1,6 +1,7 @@
 package com.github.miracle.plugins.sub
 
 import com.github.miracle.MiracleConstants
+import com.github.miracle.utils.data.SubBiliCache
 import com.github.miracle.utils.data.SubNovelCache
 import com.github.miracle.utils.data.SubscribeData
 import com.github.miracle.utils.database.BotDataBase.Platform.JJWXC
@@ -54,6 +55,7 @@ fun Bot.subJjwxc() {
                             if (SubscribeData.subscribe(group.id, nid.toString(), novel.title, JJWXC)) {
                                 // 已经插入到数据库里了
                                 // 标记最新一章
+                                SubBiliCache.refreshCache()
                                 SubNovelCache.markLastChapter(nid.toString(), novel.chapterId)
                                 subject.sendMessage(
                                     "${novel.title} : ${nid}\n订阅成功\n最新章节：第${novel.chapterId}章\n" +
@@ -96,6 +98,7 @@ fun Bot.subJjwxc() {
                 return@regex
             } else {
                 val success = SubscribeData.unsubscribe(group.id, nid.toString(), JJWXC)
+                SubNovelCache.refreshCache()
                 if (success) subject.sendMessage("取订成功: $nid") else subject.sendMessage("你没有订阅过这本小说")
             }
         }

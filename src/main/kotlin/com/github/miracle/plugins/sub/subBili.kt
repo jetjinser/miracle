@@ -40,6 +40,7 @@ fun Bot.subBili() {
                 val data = live.data
                 if (SubscribeData.subscribe(group.id, bid.toString(), data.uname, BotDataBase.Platform.BILI)) {
                     // 已经插入到数据库里了
+                    SubBiliCache.refreshCache()
                     subject.sendMessage(
                         "${data.uname} :: ${data.roomId}\n订阅成功"
                     )
@@ -71,6 +72,7 @@ fun Bot.subBili() {
                 return@regex
             } else {
                 val success = SubscribeData.unsubscribe(group.id, bid.toString(), BotDataBase.Platform.BILI)
+                SubBiliCache.refreshCache()
                 if (success) subject.sendMessage("取订成功: $bid") else subject.sendMessage("你没有订阅过这个房间")
             }
         }

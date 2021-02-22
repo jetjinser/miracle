@@ -57,6 +57,7 @@ fun Bot.subSuperIndex() {
                                     BotDataBase.Platform.SUPER
                                 )
                             ) {
+                                SubSuperCache.refreshCache()
                                 SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
                                 subject.sendMessage(
                                     "${superModel.superTitle} : \n订阅成功"
@@ -92,6 +93,7 @@ fun Bot.subSuperIndex() {
                 return@regex
             } else {
                 val success = SubscribeData.unsubscribe(group.id, sid, BotDataBase.Platform.SUPER)
+                SubSuperCache.refreshCache()
                 if (success) subject.sendMessage("取订成功: $sid") else subject.sendMessage("本群没有订阅该超话")
             }
         }
