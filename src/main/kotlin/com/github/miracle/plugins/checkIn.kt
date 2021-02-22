@@ -8,7 +8,6 @@ import com.github.miracle.utils.tools.checkIn.CheckInPicture
 import com.github.miracle.utils.tools.checkIn.CheckInPicture.BackgroundImageType
 import com.github.miracle.utils.tools.statistics.UserStatHandle
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.Contact.Companion.sendImage
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.subscribeFriendMessages
 import net.mamoe.mirai.event.subscribeGroupMessages
@@ -17,14 +16,10 @@ import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.content
 import net.mamoe.mirai.message.data.sendTo
 import net.mamoe.mirai.message.nextMessage
-import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import sun.font.FontDesignMetrics
 import java.awt.Font
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
 
 
 fun Bot.checkIn() {
@@ -148,10 +143,6 @@ fun Bot.checkIn() {
 
             case("stat", ignoreCase = true, trim = true) {
                 val stat = UserStatHandle.stat
-                if (stat == null) {
-                    subject.sendMessage("Failure")
-                    return@case
-                }
 
                 subject.sendMessage(
                     "用户: ${stat.count}人\n最高签到天数: ${stat.mostDays}\n最多持有铜币: ${stat.mostCuprum}\n最大拥有好感: ${stat.mostFavor}"
