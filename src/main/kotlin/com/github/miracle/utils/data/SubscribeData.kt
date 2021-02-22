@@ -113,7 +113,6 @@ object SubscribeData {
                         (Subscription.platform eq platform)
             }
         val result = mutableListOf<Pair<String, String>>()
-        println(query?.totalRecords)
         query?.forEach { queryRowSet ->
             val objId = queryRowSet[Subscription.objectId]
             val title = queryRowSet[Subscription.title]

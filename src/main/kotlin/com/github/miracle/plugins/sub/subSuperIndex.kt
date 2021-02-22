@@ -35,6 +35,7 @@ suspend fun getSuperInfo(sid: String): SuperIndexModel? {
         null
     }
 }
+
 fun Bot.subSuperIndex() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*超话订阅 +\w+\s*""") matching regex@{
@@ -51,11 +52,12 @@ fun Bot.subSuperIndex() {
                     // 0: 连载中 1: 已完结 2: 不存在
                     when (superModel.status) {
                         0 -> {
-                            if (SubscribeData.subscribe(group.id, sid, superModel.superTitle,
+                            if (SubscribeData.subscribe(
+                                    group.id, sid, superModel.superTitle,
                                     BotDataBase.Platform.SUPER
-                                )) {
-                                // 已经插入到数据库里了
-//                                NovelSubCache.markLastChapter(nid, superModel.chapterId)
+                                )
+                            ) {
+                                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
                                 subject.sendMessage(
                                     "${superModel.superTitle} : \n订阅成功"
                                 )
@@ -95,16 +97,16 @@ fun Bot.subSuperIndex() {
         }
     }
 
-    suspend fun Bot.sendSuperUpdate(sId:String, groupId: List<Long>, model: SuperIndexModel) {
-        groupId.forEach {
-            coroutineScope {
-                launch {
-                    val contact = getGroupOrFail(it)
-                    val client = KtorClient.getInstance()
-                    client?.let {
-                        if (model.status == 0) {
-                            model.result.forEach { model ->
-                                if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
+    suspend fun Bot.sendSuperUpdate(sId: String, groupId: List<Long>, model: SuperIndexModel) {
+        coroutineScope {
+            launch {
+                val client = KtorClient.getInstance()
+                client?.let {
+                    if (model.status == 0) {
+                        model.result.forEach { model ->
+                            if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
+                                groupId.forEach {
+                                    val contact = getGroupOrFail(it)
                                     buildMessageChain {
                                         add("${model.content}\n")
                                         if (model.ttarticleLink.isNotEmpty()) {
@@ -125,8 +127,8 @@ fun Bot.subSuperIndex() {
                             }
                         }
                     }
-                    delay(2000)
                 }
+                delay(2000)
             }
         }
     }
