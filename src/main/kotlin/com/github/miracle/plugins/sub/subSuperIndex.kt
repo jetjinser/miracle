@@ -119,7 +119,9 @@ fun Bot.subSuperIndex() {
                                             }
                                         }
                                         if (model.extra.isNotEmpty()) {
-                                            add("${model.extra}\n")
+                                            model.extra.forEach { ext->
+                                                add("$ext\n")
+                                            }
                                         }
                                         add("by ${model.author} at ${model.time}\n")
                                     }.sendTo(contact)

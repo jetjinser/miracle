@@ -33,9 +33,13 @@ object SubscribeData {
                 }
                 .forEach { queryRowSet ->
                     val objId = queryRowSet[Subscription.objectId]
-                    val groupIds = queryRowSet[Subscription.groupId]
-                    if (objId != null && groupIds != null) {
-                        result[objId] = mutableListOf(groupIds)
+                    val groupId = queryRowSet[Subscription.groupId]
+                    if (objId != null && groupId != null) {
+                        if (result[objId]==null) {
+                            result[objId] = mutableListOf(groupId)
+                        } else {
+                            result[objId]?.add(groupId)
+                        }
                     }
                 }
             return result
