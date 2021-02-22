@@ -1,4 +1,4 @@
-package com.github.miracle.plugins
+package com.github.miracle.plugins.sub
 
 import com.github.miracle.MiracleConstants
 import com.github.miracle.utils.data.SubNovelCache

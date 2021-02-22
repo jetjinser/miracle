@@ -1,4 +1,4 @@
-package com.github.miracle.plugins
+package com.github.miracle.plugins.sub
 
 import com.github.miracle.MiracleConstants
 import com.github.miracle.utils.data.SubNovelCache
@@ -95,7 +95,7 @@ fun Bot.subSuperIndex() {
         }
     }
 
-    suspend fun Bot.sendSuperUpdate(groupId: List<Long>, model: SuperIndexModel) {
+    suspend fun Bot.sendSuperUpdate(sId:String, groupId: List<Long>, model: SuperIndexModel) {
         groupId.forEach {
             coroutineScope {
                 launch {
@@ -104,8 +104,8 @@ fun Bot.subSuperIndex() {
                     client?.let {
                         if (model.status == 0) {
                             model.result.forEach { model ->
-                                // 是在五分钟内发的
-                                if (System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5) < model.time_unix) {
+                                println(model)
+                                if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
                                     buildMessageChain {
                                         add("${model.content}\n")
                                         if (model.ttarticleLink.isNotEmpty()) {
@@ -116,6 +116,9 @@ fun Bot.subSuperIndex() {
                                                 val byteArray = client.get<ByteArray>(it)
                                                 add(byteArray.inputStream().uploadAsImage(contact))
                                             }
+                                        }
+                                        if (model.extra.isNotEmpty()) {
+                                            add("${model.extra}\n")
                                         }
                                         add("by ${model.author} at ${model.time}\n")
                                     }.sendTo(contact)
@@ -128,14 +131,17 @@ fun Bot.subSuperIndex() {
             }
         }
     }
-    Timer().schedule(Date(), period = TimeUnit.MINUTES.toMillis(5)) {
+    Timer().schedule(Date(), period = TimeUnit.MINUTES.toMillis(1)) {
         val superItem = SubSuperCache.nextSub()
         launch {
             val sid = superItem.key // nid
             val groupIdList = superItem.value
 
             val model = getSuperInfo(sid) ?: return@launch
-            sendSuperUpdate(groupIdList, model)
+            if (SubSuperCache.getLastUpdateTime(sid) != 0L) {
+                sendSuperUpdate(sid, groupIdList, model)
+            }
+            SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
         }
     }
 }

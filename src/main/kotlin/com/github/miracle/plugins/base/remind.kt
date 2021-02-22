@@ -1,4 +1,4 @@
-package com.github.miracle.plugins
+package com.github.miracle.plugins.base
 
 import com.github.miracle.utils.tools.RemindDate
 import kotlinx.coroutines.launch
