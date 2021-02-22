@@ -7,13 +7,13 @@ import io.ktor.client.request.*
 import kotlinx.serialization.SerializationException
 
 object BiliLiveRoom {
-    private const val liveUrl = "https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id="
+    private const val liveUrl =
+        "https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id="
     private const val unameUrl = "https://api.live.bilibili.com/room_ex/v1/RoomNews/get?roomid="
 
     suspend fun getBiliLive(bid: Long): BiliLiveModel? {
         val url = liveUrl + bid
         val client = KtorClient.getInstance() ?: return null
-
         return try {
             client.get<BiliLiveModel>(url)
         } catch (e: SerializationException) {

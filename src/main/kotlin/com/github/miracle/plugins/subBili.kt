@@ -101,7 +101,7 @@ fun Bot.subBili() {
         }
 
     }
-    Timer().schedule(Date(), 15000) {
+    Timer().schedule(Date(), 20000) {
         val pair = SubBiliCache.nextSub()
         launch {
             val map = pair.first
