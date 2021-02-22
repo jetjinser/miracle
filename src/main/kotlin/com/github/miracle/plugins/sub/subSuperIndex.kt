@@ -35,6 +35,7 @@ suspend fun getSuperInfo(sid: String): SuperIndexModel? {
         null
     }
 }
+
 fun Bot.subSuperIndex() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*超话订阅 +\w+\s*""") matching regex@{
@@ -51,9 +52,11 @@ fun Bot.subSuperIndex() {
                     // 0: 连载中 1: 已完结 2: 不存在
                     when (superModel.status) {
                         0 -> {
-                            if (SubscribeData.subscribe(group.id, sid, superModel.superTitle,
+                            if (SubscribeData.subscribe(
+                                    group.id, sid, superModel.superTitle,
                                     BotDataBase.Platform.SUPER
-                                )) {
+                                )
+                            ) {
                                 // 已经插入到数据库里了
 //                                NovelSubCache.markLastChapter(nid, superModel.chapterId)
                                 subject.sendMessage(
@@ -95,7 +98,7 @@ fun Bot.subSuperIndex() {
         }
     }
 
-    suspend fun Bot.sendSuperUpdate(sId:String, groupId: List<Long>, model: SuperIndexModel) {
+    suspend fun Bot.sendSuperUpdate(sId: String, groupId: List<Long>, model: SuperIndexModel) {
         groupId.forEach {
             coroutineScope {
                 launch {
@@ -104,7 +107,6 @@ fun Bot.subSuperIndex() {
                     client?.let {
                         if (model.status == 0) {
                             model.result.forEach { model ->
-                                println(model)
                                 if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
                                     buildMessageChain {
                                         add("${model.content}\n")
