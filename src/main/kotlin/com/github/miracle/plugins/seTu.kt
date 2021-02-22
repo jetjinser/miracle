@@ -200,7 +200,7 @@ fun Bot.seTu() {
             }
         }
 
-        has<QuoteReply> { reply ->
+//        has<QuoteReply> { reply ->
 //            if (Regex(""".*[pP][识搜]图\s*""").matches(message.content)) {
 //                val msg = messageCache?.get(reply.source.hashCode())
 //                val messageChain = msg?.parseMiraiCode()
@@ -212,12 +212,13 @@ fun Bot.seTu() {
 //                val image = messageChain?.get(Image)?.queryUrl()
 //                if (image != null) searchAnimation(image) else subject.sendMessage("无法获取到图片, 请直接使用指令 [动画识图]")
 //            }
-        }
+//        }
 
-        val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
-        has<Image> {
-            if (it.imageId == seTuCome) seTuEmission(null)
-        }
+//        val seTuCome = "{B407F708-A2C6-A506-3420-98DF7CAC4A57}.mirai"
+//        has<Image> {
+//            subject.sendMessage(it.imageId)
+//            if (it.imageId == seTuCome) seTuEmission(null)
+//        }
 
         Regex("""\s*来点.*色图\s*""") matching {
             val keyword = it.trim().substringAfter("来点").substringBefore("色图")
