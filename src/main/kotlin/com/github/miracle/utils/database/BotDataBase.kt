@@ -1,6 +1,5 @@
 package com.github.miracle.utils.database
 
-import com.github.miracle.utils.database.BotDataBase.NovelSubscription.primaryKey
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.schema.*
 import com.github.miracle.utils.network.KtorClient
@@ -86,6 +85,17 @@ object BotDataBase {
         val groupId = long("group_id").primaryKey()
         val novelId = long("novel_id").primaryKey()
         val title = varchar("title")
+    }
+    object Subscription : Table<Nothing>("Subscription") {
+        val groupId = long("group_id").primaryKey()
+        val objectId = long("object_id").primaryKey()
+        val platform = int("platform")
+        val title = varchar("title")
+    }
+    object Platform {
+        const val BILI = 0
+        const val JJWXC = 1
+        const val SUPER = 2
     }
     object Flomo: Table<Nothing>("flomo") {
         val qqId = long("qq_id").primaryKey()
