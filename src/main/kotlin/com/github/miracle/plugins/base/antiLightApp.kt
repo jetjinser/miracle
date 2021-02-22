@@ -1,4 +1,4 @@
-package com.github.miracle.plugins
+package com.github.miracle.plugins.base
 
 import io.ktor.client.request.*
 import kotlinx.serialization.decodeFromString

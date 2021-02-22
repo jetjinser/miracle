@@ -1,4 +1,4 @@
-package com.github.miracle.plugins
+package com.github.miracle.plugins.base
 
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
