@@ -88,7 +88,7 @@ object BotDataBase {
     }
     object Subscription : Table<Nothing>("Subscription") {
         val groupId = long("group_id").primaryKey()
-        val objectId = long("object_id").primaryKey()
+        val objectId = varchar("object_id").primaryKey()
         val platform = int("platform")
         val title = varchar("title")
     }

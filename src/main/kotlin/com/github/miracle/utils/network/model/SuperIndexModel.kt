@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SuperIndexModel(
     val status: Int,
+    @SerialName("super_title")
+    val superTitle: String,
     val result: List<SuperIndex>
 ) {
     @Serializable

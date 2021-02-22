@@ -22,8 +22,8 @@ object SubscribeData {
      * 根据platform取该平台的订阅列表：
      * Return: Map<订阅id，订阅该id的所有群号>
      */
-    fun getSubQueue(platform: Int): MutableMap<Long, MutableList<Long>> {
-        val result = mutableMapOf<Long, MutableList<Long>>()
+    fun getSubQueue(platform: Int): MutableMap<String, MutableList<Long>> {
+        val result = mutableMapOf<String, MutableList<Long>>()
         if (dataBase == null) {
             throw NullPointerException()
         } else {
@@ -45,7 +45,7 @@ object SubscribeData {
     /**
      * 添加新订阅
      */
-    fun subscribe(groupId: Long, objectId: Long, title: String, platform: Int): Boolean {
+    fun subscribe(groupId: Long, objectId: String, title: String, platform: Int): Boolean {
         return if (dataBase == null) {
             false
         } else {
@@ -74,7 +74,7 @@ object SubscribeData {
     /**
      * 取消订阅
      */
-    fun unsubscribe(groupId: Long, objId: Long, platform: Int): Boolean {
+    fun unsubscribe(groupId: Long, objId: String, platform: Int): Boolean {
         println("groupid:$groupId, objId:$objId, platform:$platform")
         val effects = dataBase?.delete(Subscription) {
             it.platform eq platform
@@ -88,12 +88,12 @@ object SubscribeData {
     /**
      * 获取一个群的所有订阅
      */
-    fun getAllSubList(groupId: Long): MutableList<Pair<Long, String>>? {
+    fun getAllSubList(groupId: Long): MutableList<Pair<String, String>>? {
         val query = dataBase?.from(Subscription)?.select(Subscription.objectId, Subscription.title)
             ?.where {
                 Subscription.groupId eq groupId
             }
-        val result = mutableListOf<Pair<Long, String>>()
+        val result = mutableListOf<Pair<String, String>>()
         query?.forEach { queryRowSet ->
             val objId = queryRowSet[Subscription.objectId]
             val title = queryRowSet[Subscription.title]
@@ -105,13 +105,13 @@ object SubscribeData {
     /**
      * 获取一个群单平台订阅
      */
-    fun getPlatformSubList(groupId: Long, platform: Int): MutableList<Pair<Long, String>>? {
+    fun getPlatformSubList(groupId: Long, platform: Int): MutableList<Pair<String, String>>? {
         val query = dataBase?.from(Subscription)?.select(Subscription.objectId, Subscription.title)
             ?.where {
                 Subscription.groupId eq groupId
                 Subscription.platform eq platform
             }
-        val result = mutableListOf<Pair<Long, String>>()
+        val result = mutableListOf<Pair<String, String>>()
         query?.forEach { queryRowSet ->
             val objId = queryRowSet[Subscription.objectId]
             val title = queryRowSet[Subscription.title]

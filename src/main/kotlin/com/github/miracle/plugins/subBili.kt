@@ -1,6 +1,6 @@
 package com.github.miracle.plugins
 
-import com.github.miracle.utils.data.BiliSubCache
+import com.github.miracle.utils.data.SubBiliCache
 import com.github.miracle.utils.data.SubscribeData
 import com.github.miracle.utils.database.BotDataBase
 import com.github.miracle.utils.network.KtorClient
@@ -21,7 +21,7 @@ import java.time.Instant
 import java.util.*
 import kotlin.concurrent.schedule
 
-fun Bot.biliSub() {
+fun Bot.subBili() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*b订阅 +\w+\s*""") matching regex@{
             val msg = it.substringAfter("b订阅").trim()
@@ -38,7 +38,7 @@ fun Bot.biliSub() {
                     return@regex
                 }
                 val data = live.data
-                if (SubscribeData.subscribe(group.id, bid, data.uname, BotDataBase.Platform.BILI)) {
+                if (SubscribeData.subscribe(group.id, bid.toString(), data.uname, BotDataBase.Platform.BILI)) {
                     // 已经插入到数据库里了
                     subject.sendMessage(
                         "${data.uname} :: ${data.roomId}\n订阅成功"
@@ -70,12 +70,12 @@ fun Bot.biliSub() {
                 subject.sendMessage("房间号是数字喔")
                 return@regex
             } else {
-                val success = SubscribeData.unsubscribe(group.id, bid, BotDataBase.Platform.BILI)
+                val success = SubscribeData.unsubscribe(group.id, bid.toString(), BotDataBase.Platform.BILI)
                 if (success) subject.sendMessage("取订成功: $bid") else subject.sendMessage("你没有订阅过这个房间")
             }
         }
     }
-    suspend fun Bot.sendBiliLive(bid: Long, groupId: List<Long>, model: BiliLiveModel) {
+    suspend fun Bot.sendBiliLive(bid: String, groupId: List<Long>, model: BiliLiveModel) {
         groupId.forEach {
             val bi = model.data.anchorInfo.baseInfo
             val ri = model.data.roomInfo
@@ -102,7 +102,7 @@ fun Bot.biliSub() {
 
     }
     Timer().schedule(Date(), 15000) {
-        val pair = BiliSubCache.nextSub()
+        val pair = SubBiliCache.nextSub()
         launch {
             val map = pair.first
             val cache = pair.second
@@ -110,17 +110,17 @@ fun Bot.biliSub() {
             val bid = map.key
             val groupId = map.value
 
-            val model = BiliLiveRoom.getBiliLive(bid) ?: return@launch
+            val model = BiliLiveRoom.getBiliLive(bid.toLong()) ?: return@launch
             val status = model.data.roomInfo.liveStatus
 
             val live = if (status == 0) false else status == 1
             if (live) {
                 if (cache[bid] != true) {
-                    BiliSubCache.markLiving(bid)
+                    SubBiliCache.markLiving(bid)
                     sendBiliLive(bid, groupId, model)
                 }
             } else {
-                if (cache[bid] != false) BiliSubCache.markUnliving(bid)
+                if (cache[bid] != false) SubBiliCache.markUnliving(bid)
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.github.miracle.plugins
 
 import com.github.miracle.MiracleConstants
-import com.github.miracle.utils.data.NovelSubCache
+import com.github.miracle.utils.data.SubNovelCache
 import com.github.miracle.utils.data.SubscribeData
 import com.github.miracle.utils.database.BotDataBase.Platform.JJWXC
 import com.github.miracle.utils.network.KtorClient
@@ -22,7 +22,7 @@ import kotlin.concurrent.schedule
 /**
  * 获取novel信息
  */
-suspend fun getNovelInfo(nid: Long): NovelModel? {
+suspend fun getNovelInfo(nid: String): NovelModel? {
     val client = KtorClient.getInstance() ?: return null
     val url = MiracleConstants.SUB_API_URL + "/get_novel_info/"
     return try {
@@ -32,7 +32,7 @@ suspend fun getNovelInfo(nid: Long): NovelModel? {
     }
 }
 
-fun Bot.jjwxc() {
+fun Bot.subJjwxc() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*j订阅 +\w+\s*""") matching regex@{
             val msg = it.substringAfter("j订阅").trim()
@@ -42,7 +42,7 @@ fun Bot.jjwxc() {
                 subject.sendMessage("小说id是数字喔")
                 return@regex
             } else {
-                val novel = getNovelInfo(nid)
+                val novel = getNovelInfo(nid.toString())
                 if (novel == null) {
                     // 不存在
                     subject.sendMessage("没有查询到信息, 请确认小说id正确")
@@ -51,10 +51,10 @@ fun Bot.jjwxc() {
                     // 0: 连载中 1: 已完结 2: 不存在
                     when (novel.status) {
                         0 -> {
-                            if (SubscribeData.subscribe(group.id, nid, novel.title, JJWXC)) {
+                            if (SubscribeData.subscribe(group.id, nid.toString(), novel.title, JJWXC)) {
                                 // 已经插入到数据库里了
                                 // 标记最新一章
-                                NovelSubCache.markLastChapter(nid, novel.chapterId)
+                                SubNovelCache.markLastChapter(nid.toString(), novel.chapterId)
                                 subject.sendMessage(
                                     "${novel.title} : ${nid}\n订阅成功\n最新章节：第${novel.chapterId}章\n" +
                                             "${novel.chapterTitle}:${novel.chapterDesc}"
@@ -95,7 +95,7 @@ fun Bot.jjwxc() {
                 subject.sendMessage("小说id是数字喔")
                 return@regex
             } else {
-                val success = SubscribeData.unsubscribe(group.id, nid, JJWXC)
+                val success = SubscribeData.unsubscribe(group.id, nid.toString(), JJWXC)
                 if (success) subject.sendMessage("取订成功: $nid") else subject.sendMessage("你没有订阅过这本小说")
             }
         }
@@ -117,7 +117,7 @@ fun Bot.jjwxc() {
     }
 
     Timer().schedule(Date(), 20000) {
-        val pair = NovelSubCache.nextSub()
+        val pair = SubNovelCache.nextSub()
         launch {
             val novelMap = pair.first // nid: list(gid)
             val chapterCache = pair.second // {novelId:chapterId}
@@ -127,13 +127,10 @@ fun Bot.jjwxc() {
 
             val model = getNovelInfo(nid) ?: return@launch
 
-            println("n:${model.title}, chapterchache:${chapterCache[nid]}")
             if (chapterCache[nid] != 0 && chapterCache[nid] != null && model.chapterId > chapterCache[nid] ?: 0) {
                 sendNovelUpdate(groupIdList, model)
             }
-            NovelSubCache.markLastChapter(nid, model.chapterId)
+            SubNovelCache.markLastChapter(nid, model.chapterId)
         }
     }
-
-
 }

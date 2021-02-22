@@ -16,7 +16,7 @@ fun Bot.remind() {
 
     eventChannel.subscribeGroupMessages {
         contains("后提醒我") {
-            val msg = message[MessageSource.Key]?.content ?: return@contains
+            val msg = message.content
 
             val result = Regex("""(?<date>.*后)\s*提醒我(?<something>.*)""").matchEntire(msg)
             if (result == null) {
