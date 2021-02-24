@@ -112,7 +112,7 @@ fun Bot.subSuperIndex() {
                                     buildMessageChain {
                                         add("${model.content}\n")
                                         if (model.ttarticleLink.isNotEmpty()) {
-                                            add("${model.ttarticleLink}\n")
+                                            add("头条文章：${model.ttarticleLink}\n")
                                         }
                                         if (model.imgUrls.isNotEmpty()) {
                                             model.imgUrls.forEach {
@@ -121,11 +121,16 @@ fun Bot.subSuperIndex() {
                                             }
                                         }
                                         if (model.extra.isNotEmpty()) {
-                                            model.extra.forEach { ext->
-                                                add("$ext\n")
+                                            model.extra.forEach { ext ->
+                                                if (!ext.contains("weibo.com/n/")
+                                                    && !ext.contains("weibo.com/p/")) {
+                                                    // 排除@和位置信息
+                                                    add("$ext\n")
+                                                }
                                             }
                                         }
                                         add("by ${model.author} at ${model.time}\n")
+                                        add(model.link) // 原微博链接
                                     }.sendTo(contact)
                                 }
                             }
@@ -144,9 +149,11 @@ fun Bot.subSuperIndex() {
 
             val model = getSuperInfo(sid) ?: return@launch
             if (SubSuperCache.getLastUpdateTime(sid) != 0L) {
+                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
                 sendSuperUpdate(sid, groupIdList, model)
+            } else{
+                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
             }
-            SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
         }
     }
 }
