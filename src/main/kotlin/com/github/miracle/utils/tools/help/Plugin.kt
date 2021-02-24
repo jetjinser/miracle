@@ -20,7 +20,8 @@ object Plugin {
         Tuling(Regex("""(?i)(图灵(回[复答]|[问答]+|对话|交流))|Tuling""")),
         Thesaurus(Regex("""(?i)((有?关于)?(词库|问答)([相有]关)?)|Thesaurus""")),
         WoPay(Regex("""(?i)(赞助支持|租借(系统)?)|WoPay""")),
-        Translate(Regex("""(?i)翻译|Translate"""))
+        Translate(Regex("""(?i)翻译|Translate""")),
+        Subscription(Regex("""(?i)订阅|Subscription"""))
     }
 
     fun findPlugin(pluginName: String): EPlugin? {

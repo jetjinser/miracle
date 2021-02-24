@@ -66,7 +66,6 @@ class Helper(pluginName: String) {
         """.trimMargin()
         val music = """[Music]
             |点歌, 目前支持: 网易云, 酷狗
-            |被一切障碍摧毁了
             |可用指令:
             |  - [网易云/酷狗]点歌 <歌名>
             |       消费 50 铜币 @see CheckIn
@@ -117,6 +116,16 @@ class Helper(pluginName: String) {
             |  - @bot token
             |  - 查询到期
         """.trimMargin()
+        val subscription = """[Subscription]
+            |各种订阅
+            |可用指令:
+            |  - j订阅 <晋江小说id>
+            |      订阅小说更新提醒
+            |  - 超话订阅 <超话id>
+            |      超话更新提醒 
+            |  - b订阅 <b站直播间房间号>
+            |      直播开播更新提醒
+        """.trimMargin()
     }
 
     fun getDesc() =
@@ -138,6 +147,7 @@ class Helper(pluginName: String) {
             Plugin.EPlugin.Thesaurus -> thesaurus
             Plugin.EPlugin.WoPay -> woPay
             Plugin.EPlugin.Translate -> translate
+            Plugin.EPlugin.Subscription -> subscription
             else -> null
         }
 }

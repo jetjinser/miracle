@@ -25,7 +25,7 @@ suspend fun main() {
         subBili()
         button()
         antiLightApp()
-//        recode()
+//        record()
         thesaurus()
 //        setting()
         music()
