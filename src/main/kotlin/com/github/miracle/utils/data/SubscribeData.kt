@@ -33,9 +33,13 @@ object SubscribeData {
                 }
                 .forEach { queryRowSet ->
                     val objId = queryRowSet[Subscription.objectId]
-                    val groupIds = queryRowSet[Subscription.groupId]
-                    if (objId != null && groupIds != null) {
-                        result[objId] = mutableListOf(groupIds)
+                    val groupId = queryRowSet[Subscription.groupId]
+                    if (objId != null && groupId != null) {
+                        if (result[objId]==null) {
+                            result[objId] = mutableListOf(groupId)
+                        } else {
+                            result[objId]?.add(groupId)
+                        }
                     }
                 }
             return result
@@ -75,11 +79,10 @@ object SubscribeData {
      * 取消订阅
      */
     fun unsubscribe(groupId: Long, objId: String, platform: Int): Boolean {
-        println("groupid:$groupId, objId:$objId, platform:$platform")
         val effects = dataBase?.delete(Subscription) {
-            it.platform eq platform
-            it.groupId eq groupId
-            it.objectId eq objId
+            (it.platform eq platform) and
+            (it.groupId eq groupId) and
+            (it.objectId eq objId)
         }
         println(effects)
         return if (effects != null) effects != 0 else false
@@ -106,10 +109,11 @@ object SubscribeData {
      * 获取一个群单平台订阅
      */
     fun getPlatformSubList(groupId: Long, platform: Int): MutableList<Pair<String, String>>? {
+        println("groupId:$groupId")
         val query = dataBase?.from(Subscription)?.select(Subscription.objectId, Subscription.title)
             ?.where {
-                Subscription.groupId eq groupId
-                Subscription.platform eq platform
+                (Subscription.groupId eq groupId) and
+                        (Subscription.platform eq platform)
             }
         val result = mutableListOf<Pair<String, String>>()
         query?.forEach { queryRowSet ->

@@ -57,8 +57,8 @@ fun Bot.subSuperIndex() {
                                     BotDataBase.Platform.SUPER
                                 )
                             ) {
-                                // 已经插入到数据库里了
-//                                NovelSubCache.markLastChapter(nid, superModel.chapterId)
+                                SubSuperCache.refreshCache()
+                                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
                                 subject.sendMessage(
                                     "${superModel.superTitle} : \n订阅成功"
                                 )
@@ -93,25 +93,26 @@ fun Bot.subSuperIndex() {
                 return@regex
             } else {
                 val success = SubscribeData.unsubscribe(group.id, sid, BotDataBase.Platform.SUPER)
+                SubSuperCache.refreshCache()
                 if (success) subject.sendMessage("取订成功: $sid") else subject.sendMessage("本群没有订阅该超话")
             }
         }
     }
 
     suspend fun Bot.sendSuperUpdate(sId: String, groupId: List<Long>, model: SuperIndexModel) {
-        groupId.forEach {
-            coroutineScope {
-                launch {
-                    val contact = getGroupOrFail(it)
-                    val client = KtorClient.getInstance()
-                    client?.let {
-                        if (model.status == 0) {
-                            model.result.forEach { model ->
-                                if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
+        coroutineScope {
+            launch {
+                val client = KtorClient.getInstance()
+                client?.let {
+                    if (model.status == 0) {
+                        model.result.forEach { model ->
+                            if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
+                                groupId.forEach {
+                                    val contact = getGroupOrFail(it)
                                     buildMessageChain {
                                         add("${model.content}\n")
                                         if (model.ttarticleLink.isNotEmpty()) {
-                                            add("${model.ttarticleLink}\n")
+                                            add("头条文章：${model.ttarticleLink}\n")
                                         }
                                         if (model.imgUrls.isNotEmpty()) {
                                             model.imgUrls.forEach {
@@ -120,16 +121,23 @@ fun Bot.subSuperIndex() {
                                             }
                                         }
                                         if (model.extra.isNotEmpty()) {
-                                            add("${model.extra}\n")
+                                            model.extra.forEach { ext ->
+                                                if (!ext.contains("weibo.com/n/")
+                                                    && !ext.contains("weibo.com/p/")) {
+                                                    // 排除@和位置信息
+                                                    add("$ext\n")
+                                                }
+                                            }
                                         }
                                         add("by ${model.author} at ${model.time}\n")
+                                        add(model.link) // 原微博链接
                                     }.sendTo(contact)
                                 }
                             }
                         }
                     }
-                    delay(2000)
                 }
+                delay(2000)
             }
         }
     }
@@ -141,9 +149,11 @@ fun Bot.subSuperIndex() {
 
             val model = getSuperInfo(sid) ?: return@launch
             if (SubSuperCache.getLastUpdateTime(sid) != 0L) {
+                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
                 sendSuperUpdate(sid, groupIdList, model)
+            } else{
+                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
             }
-            SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
         }
     }
 }
