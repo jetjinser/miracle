@@ -107,9 +107,10 @@ class Helper(pluginName: String) {
             |       每次消耗 200 铜币
         """.trimMargin()
         val translate = """[Translate]
-            |谷歌翻译
+            |谷歌翻译/摩斯电码转换
             |可用指令:
             |  - 翻译 <原文>
+            |  - 摩斯 <原文（原文中不能有.-/）>
         """.trimMargin()
         val woPay = """[WoPay]
             |可用指令:
