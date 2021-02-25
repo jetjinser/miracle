@@ -6,12 +6,18 @@ import net.mamoe.mirai.event.subscribeGroupMessages
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.ActivityModel
 import com.github.miracle.utils.network.model.ShanBayDailyQuoteModel
+import com.github.miracle.utils.network.model.ShiCiModel
 
 fun Bot.information() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*一言|(five|废物|二次元)语录\s*""") matching regex@{
-            val five = KtorClient.getInstance()?.get<String>("https://api.imjad.cn/hitokoto/")
-            if (five != null) subject.sendMessage(five) else subject.sendMessage("获取失败")
+            subject.sendMessage("暂时坏了喔")
+//            val five = KtorClient.getInstance()?.get<String>("https://api.imjad.cn/hitokoto/")
+//            if (five != null) subject.sendMessage(five.content) else subject.sendMessage("获取失败")
+        }
+        Regex("""\s*今日诗词\s*""") matching regex@{
+            val five = KtorClient.getInstance()?.get<ShiCiModel>("https://v1.jinrishici.com/all")
+            if (five != null) subject.sendMessage(five.content) else subject.sendMessage("获取失败")
         }
 
         case("每日一句", trim = true) {
