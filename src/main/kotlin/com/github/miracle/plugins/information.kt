@@ -12,8 +12,8 @@ fun Bot.information() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*一言|(five|废物|二次元)语录\s*""") matching regex@{
             subject.sendMessage("暂时坏了喔")
-//            val five = KtorClient.getInstance()?.get<String>("https://api.imjad.cn/hitokoto/")
-//            if (five != null) subject.sendMessage(five.content) else subject.sendMessage("获取失败")
+            val five = KtorClient.getInstance()?.get<String>("https://v1.hitokoto.cn/?encode=text")
+            if (five != null) subject.sendMessage(five) else subject.sendMessage("获取失败")
         }
         Regex("""\s*今日诗词\s*""") matching regex@{
             val five = KtorClient.getInstance()?.get<ShiCiModel>("https://v1.jinrishici.com/all")
