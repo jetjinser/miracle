@@ -62,8 +62,7 @@ fun Bot.tuling() {
     }
 
     eventChannel.subscribeGroupMessages(priority = EventPriority.MONITOR) {
-        has<At> { at ->
-            if (at.target != bot.id) return@has
+        atBot {
             tulingReply(message.drop(2).toMessageChain().content)
         }
     }
