@@ -4,7 +4,7 @@ import com.github.miracle.MiracleConstants
 import com.github.miracle.utils.data.SubBiliCache
 import com.github.miracle.utils.data.SubNovelCache
 import com.github.miracle.utils.data.SubscribeData
-import com.github.miracle.utils.database.BotDataBase.Platform.JJWXC
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.JJWXC
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.NovelModel
 import io.ktor.client.request.*
@@ -83,7 +83,7 @@ fun Bot.subJjwxc() {
             } else {
                 subject.sendMessage(
                     list.joinToString("\n") {
-                        "${it.first.toString().padEnd(8, ' ')} - ${it.second}"
+                        "${it.first.padEnd(8, ' ')} - ${it.second}"
                     }
                 )
             }

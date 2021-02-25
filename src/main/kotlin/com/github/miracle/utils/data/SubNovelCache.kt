@@ -1,6 +1,6 @@
 package com.github.miracle.utils.data
 
-import com.github.miracle.utils.database.BotDataBase.Platform.JJWXC
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.JJWXC
 
 object SubNovelCache {
     private val novelChapterCache = mutableMapOf<String, Int>() // 每个小说的章节信息缓存Map<nid, lastChapId>
@@ -14,9 +14,10 @@ object SubNovelCache {
             novelIter.next()
         } to novelChapterCache
 
-    fun refreshCache(){
+    fun refreshCache() {
         novelQueue = SubscribeData.getSubQueue(JJWXC)
     }
+
     fun markLastChapter(nid: String, cid: Int) {
         novelChapterCache[nid] = cid
     }

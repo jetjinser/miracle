@@ -2,7 +2,7 @@ package com.github.miracle.plugins.sub
 
 import com.github.miracle.utils.data.SubBiliCache
 import com.github.miracle.utils.data.SubscribeData
-import com.github.miracle.utils.database.BotDataBase
+import com.github.miracle.utils.database.BotDataBase.SubPlatform
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.BiliLiveModel
 import com.github.miracle.utils.tools.bili.BiliLiveRoom
@@ -38,7 +38,7 @@ fun Bot.subBili() {
                     return@regex
                 }
                 val data = live.data
-                if (SubscribeData.subscribe(group.id, bid.toString(), data.uname, BotDataBase.Platform.BILI)) {
+                if (SubscribeData.subscribe(group.id, bid.toString(), data.uname, SubPlatform.BILI)) {
                     // 已经插入到数据库里了
                     SubBiliCache.refreshCache()
                     subject.sendMessage(
@@ -51,13 +51,13 @@ fun Bot.subBili() {
         }
 
         case("b订阅列表") {
-            val list = SubscribeData.getPlatformSubList(group.id, BotDataBase.Platform.BILI)
+            val list = SubscribeData.getPlatformSubList(group.id, SubPlatform.BILI)
             if (list == null) {
                 subject.sendMessage("本群还没有订阅")
             } else {
                 subject.sendMessage(
                     list.joinToString("\n") {
-                        "${it.first.toString().padEnd(8, ' ')} - ${it.second}"
+                        "${it.first.padEnd(8, ' ')} - ${it.second}"
                     }
                 )
             }
@@ -71,12 +71,13 @@ fun Bot.subBili() {
                 subject.sendMessage("房间号是数字喔")
                 return@regex
             } else {
-                val success = SubscribeData.unsubscribe(group.id, bid.toString(), BotDataBase.Platform.BILI)
+                val success = SubscribeData.unsubscribe(group.id, bid.toString(), SubPlatform.BILI)
                 SubBiliCache.refreshCache()
                 if (success) subject.sendMessage("取订成功: $bid") else subject.sendMessage("你没有订阅过这个房间")
             }
         }
     }
+
     suspend fun Bot.sendBiliLive(bid: String, groupId: List<Long>, model: BiliLiveModel) {
         groupId.forEach {
             val bi = model.data.anchorInfo.baseInfo
@@ -101,8 +102,8 @@ fun Bot.subBili() {
                 }
             }
         }
-
     }
+
     Timer().schedule(Date(), 20000) {
         val pair = SubBiliCache.nextSub()
         launch {

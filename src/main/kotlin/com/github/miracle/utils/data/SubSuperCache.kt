@@ -1,6 +1,6 @@
 package com.github.miracle.utils.data
 
-import com.github.miracle.utils.database.BotDataBase.Platform.SUPER
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.SUPER
 
 object SubSuperCache {
     private val superCache = mutableMapOf<String, Long>()

@@ -1,12 +1,12 @@
 package com.github.miracle.utils.data
 
-import com.github.miracle.utils.database.BotDataBase.Platform.BILI
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.BILI
 
 object SubBiliCache {
-
     private val liveRoomCache = mutableMapOf<String, Boolean>()
     private var liveQueue = SubscribeData.getSubQueue(BILI)
     private var liveIter = liveQueue.iterator()
+
     fun nextSub(): Pair<MutableMap.MutableEntry<String, MutableList<Long>>, MutableMap<String, Boolean>> =
         if (liveIter.hasNext()) {
             liveIter.next()
@@ -15,7 +15,7 @@ object SubBiliCache {
             liveIter.next()
         } to liveRoomCache
 
-    fun refreshCache(){
+    fun refreshCache() {
         liveQueue = SubscribeData.getSubQueue(BILI)
     }
 

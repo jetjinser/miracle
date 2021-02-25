@@ -76,28 +76,20 @@ object BotDataBase {
     }
     // end region
 
-    object BiliSubscription : Table<Nothing>("BiliSubscription") {
-        val groupId = long("group_id").primaryKey()
-        val roomId = long("room_id").primaryKey()
-        val uname = varchar("uname")
-    }
-    object NovelSubscription : Table<Nothing>("NovelSubscription") {
-        val groupId = long("group_id").primaryKey()
-        val novelId = long("novel_id").primaryKey()
-        val title = varchar("title")
-    }
     object Subscription : Table<Nothing>("Subscription") {
         val groupId = long("group_id").primaryKey()
         val objectId = varchar("object_id").primaryKey()
         val platform = int("platform")
         val title = varchar("title")
     }
-    object Platform {
-        const val BILI = 0
-        const val JJWXC = 1
-        const val SUPER = 2
+
+    enum class SubPlatform(val value: Int) {
+        BILI(0),
+        JJWXC(1),
+        SUPER(2),
     }
-    object Flomo: Table<Nothing>("flomo") {
+
+    object Flomo : Table<Nothing>("flomo") {
         val qqId = long("qq_id").primaryKey()
         val flomoKey = varchar("flomo_key")
     }

@@ -1,10 +1,9 @@
 package com.github.miracle.plugins.sub
 
 import com.github.miracle.MiracleConstants
-import com.github.miracle.utils.data.SubNovelCache
 import com.github.miracle.utils.data.SubSuperCache
 import com.github.miracle.utils.data.SubscribeData
-import com.github.miracle.utils.database.BotDataBase
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.SUPER
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.SuperIndexModel
 import io.ktor.client.request.*
@@ -54,7 +53,7 @@ fun Bot.subSuperIndex() {
                         0 -> {
                             if (SubscribeData.subscribe(
                                     group.id, sid, superModel.superTitle,
-                                    BotDataBase.Platform.SUPER
+                                    SUPER
                                 )
                             ) {
                                 SubSuperCache.refreshCache()
@@ -75,7 +74,7 @@ fun Bot.subSuperIndex() {
         }
 
         case("超话订阅列表") {
-            val list = SubscribeData.getPlatformSubList(group.id, BotDataBase.Platform.SUPER)
+            val list = SubscribeData.getPlatformSubList(group.id, SUPER)
             if (list == null) {
                 subject.sendMessage("本群还没有订阅超话")
             } else {
@@ -92,7 +91,7 @@ fun Bot.subSuperIndex() {
             if (sid.isEmpty()) {
                 return@regex
             } else {
-                val success = SubscribeData.unsubscribe(group.id, sid, BotDataBase.Platform.SUPER)
+                val success = SubscribeData.unsubscribe(group.id, sid, SUPER)
                 SubSuperCache.refreshCache()
                 if (success) subject.sendMessage("取订成功: $sid") else subject.sendMessage("本群没有订阅该超话")
             }
@@ -123,7 +122,8 @@ fun Bot.subSuperIndex() {
                                         if (model.extra.isNotEmpty()) {
                                             model.extra.forEach { ext ->
                                                 if (!ext.contains("weibo.com/n/")
-                                                    && !ext.contains("weibo.com/p/")) {
+                                                    && !ext.contains("weibo.com/p/")
+                                                ) {
                                                     // 排除@和位置信息
                                                     add("$ext\n")
                                                 }
@@ -151,7 +151,7 @@ fun Bot.subSuperIndex() {
             if (SubSuperCache.getLastUpdateTime(sid) != 0L) {
                 SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
                 sendSuperUpdate(sid, groupIdList, model)
-            } else{
+            } else {
                 SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
             }
         }
