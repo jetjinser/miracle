@@ -1,4 +1,5 @@
 package com.github.miracle.utils.network.model
+
 import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
@@ -14,20 +15,20 @@ data class BiliCheckModel(
     val message: String,
     @SerialName("msg")
     val msg: String
-)
-
-@Serializable
-data class Data(
-    @SerialName("content")
-    val content: String,
-    @SerialName("ctime")
-    val ctime: String,
-    @SerialName("roomid")
-    val roomId: String,
-    @SerialName("status")
-    val status: String,
-    @SerialName("uid")
-    val uid: String,
-    @SerialName("uname")
-    val uname: String
-)
+) {
+    @Serializable
+    data class Data(
+        @SerialName("content")
+        val content: String,
+        @SerialName("ctime")
+        val ctime: String,
+        @SerialName("roomid")
+        val roomId: String,
+        @SerialName("status")
+        val status: String,
+        @SerialName("uid")
+        val uid: String,
+        @SerialName("uname")
+        val uname: String
+    )
+}
