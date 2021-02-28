@@ -66,7 +66,6 @@ class Helper(pluginName: String) {
         """.trimMargin()
         val music = """[Music]
             |点歌, 目前支持: 网易云, 酷狗
-            |被一切障碍摧毁了
             |可用指令:
             |  - [网易云/酷狗]点歌 <歌名>
             |       消费 50 铜币 @see CheckIn
@@ -108,14 +107,25 @@ class Helper(pluginName: String) {
             |       每次消耗 200 铜币
         """.trimMargin()
         val translate = """[Translate]
-            |谷歌翻译
+            |谷歌翻译/摩斯电码转换
             |可用指令:
             |  - 翻译 <原文>
+            |  - 摩斯 <原文（原文中不能有.-/）>
         """.trimMargin()
         val woPay = """[WoPay]
             |可用指令:
             |  - @bot token
             |  - 查询到期
+        """.trimMargin()
+        val subscription = """[Subscription]
+            |各种订阅
+            |可用指令:
+            |  - j订阅 <晋江小说id>
+            |      订阅小说更新提醒
+            |  - 超话订阅 <超话id>
+            |      超话更新提醒 
+            |  - b订阅 <b站直播间房间号>
+            |      直播开播更新提醒
         """.trimMargin()
     }
 
@@ -138,6 +148,7 @@ class Helper(pluginName: String) {
             Plugin.EPlugin.Thesaurus -> thesaurus
             Plugin.EPlugin.WoPay -> woPay
             Plugin.EPlugin.Translate -> translate
+            Plugin.EPlugin.Subscription -> subscription
             else -> null
         }
 }

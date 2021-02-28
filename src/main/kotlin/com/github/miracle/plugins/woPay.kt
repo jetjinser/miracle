@@ -2,7 +2,7 @@ package com.github.miracle.plugins
 
 import com.github.miracle.SecretConfig
 import com.github.miracle.utils.data.WoPayData
-import com.github.miracle.utils.tools.timer.calendarGen
+import com.github.miracle.utils.tools.timer.timeStart
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
@@ -23,7 +23,7 @@ fun Bot.woPay() {
         WoPayData.register(group.id, LocalDate.now().toString())
     }
 
-    Timer().schedule(calendarGen(4).time) {
+    Timer().schedule(timeStart(4).time) {
         for (group in this@woPay.groups) {
             val date = LocalDate.parse(WoPayData.inquire(group.id), DateTimeFormatter.ISO_DATE)
             if (date.isBefore(LocalDate.now())) {
@@ -38,30 +38,22 @@ fun Bot.woPay() {
 
     eventChannel.subscribeGroupMessages(priority = EventPriority.LOWEST) {
         contains("token", ignoreCase = true, trim = true) {
-            var isAt = false
-            var content = ""
-            for (item in message.contentsList()) {
-                if (item is At && item.target == bot.id) {
-                    isAt = true
+            atBot {
+                val content = message.first { it is PlainText }.content
+                var msg = content.substringAfter("token").trim()
+                if (msg.isEmpty()) {
+                    subject.sendMessage("请发送token")
+                    msg = nextMessage { message[MessageSource.Key] != null }.content.trim() // TODO
                 }
-                if (item is PlainText) {
-                    content = item.content
+                val success = WoPayData.renewByToken(msg, group.id)
+                if (success == null) {
+                    subject.sendMessage("失败, token不存在")
+                    intercept()
+                    return@atBot
                 }
-            }
-            if (!isAt) return@contains
-            var msg = content.substringAfter("token").trim()
-            if (msg.isEmpty()) {
-                subject.sendMessage("请发送token")
-                msg = nextMessage { message[MessageSource.Key] != null }.content.trim() // TODO
-            }
-            val success = WoPayData.renewByToken(msg, group.id)
-            if (success == null) {
-                subject.sendMessage("失败, token不存在")
+                subject.sendMessage("成功! 续期到 $success")
                 intercept()
-                return@contains
             }
-            subject.sendMessage("成功! 续期到 $success")
-            intercept()
         }
 
         Regex("""\s*查询到期(日期)?\s*""") matching {
@@ -71,8 +63,8 @@ fun Bot.woPay() {
     }
 
     eventChannel.subscribeFriendMessages {
-        sentBy(SecretConfig.owner) {
-            startsWith("get_token", removePrefix = true, trim = true) {
+        startsWith("get_token", removePrefix = true, trim = true) {
+            if (sender.id == SecretConfig.owner) {
                 var days = it.toIntOrNull()
                 if (days == null) {
                     subject.sendMessage("几日?")
@@ -82,8 +74,10 @@ fun Bot.woPay() {
                     WoPayData.genToken(days) ?: "Nil"
                 )
             }
+        }
 
-            startsWith("pay", removePrefix = true, trim = true) { s ->
+        startsWith("pay", removePrefix = true, trim = true) { s ->
+            if (sender.id == SecretConfig.owner) {
                 val list = s.split(" ").filter { it.isNotEmpty() }
                 var days = list.getOrNull(0)?.toIntOrNull()
                 var groupId = list.getOrNull(1)?.toIntOrNull()
@@ -94,7 +88,8 @@ fun Bot.woPay() {
                 }
                 if (groupId == null) {
                     subject.sendMessage("什么群?")
-                    groupId = nextMessage { message.content.toIntOrNull() != null }.content.toInt()
+                    groupId =
+                        nextMessage { message.content.toIntOrNull() != null }.content.toInt()
                 }
 
                 subject.sendMessage(

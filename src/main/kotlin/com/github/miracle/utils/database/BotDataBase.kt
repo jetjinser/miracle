@@ -96,6 +96,7 @@ object BotDataBase {
         const val BILI = 0
         const val JJWXC = 1
         const val SUPER = 2
+        const val WEIBO = 3
     }
     object Flomo: Table<Nothing>("flomo") {
         val qqId = long("qq_id").primaryKey()

@@ -1,12 +1,12 @@
 package com.github.miracle.plugins.sub
 
 import com.github.miracle.MiracleConstants
-import com.github.miracle.utils.data.SubNovelCache
-import com.github.miracle.utils.data.SubSuperCache
+import com.github.miracle.utils.data.SubWeiboCache
 import com.github.miracle.utils.data.SubscribeData
 import com.github.miracle.utils.database.BotDataBase
+import com.github.miracle.utils.database.BotDataBase.Platform.SUPER
 import com.github.miracle.utils.network.KtorClient
-import com.github.miracle.utils.network.model.SuperIndexModel
+import com.github.miracle.utils.network.model.WeiboResponseModel
 import io.ktor.client.request.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -26,11 +26,11 @@ private const val lizzieBar = 637538362L
 /**
  * 获取novel信息
  */
-suspend fun getSuperInfo(sid: String): SuperIndexModel? {
+suspend fun getSuperInfo(sid: String): WeiboResponseModel? {
     val client = KtorClient.getInstance() ?: return null
     val url = MiracleConstants.SUB_API_URL + "/super-index-rss/"
     return try {
-        client.get<SuperIndexModel>(url + sid)
+        client.get<WeiboResponseModel>(url + sid)
     } catch (e: SerializationException) {
         null
     }
@@ -49,18 +49,17 @@ fun Bot.subSuperIndex() {
                     subject.sendMessage("没有查询到信息, 超话id为网页端超话链接即https://weibo.com/p/[id]/super_index中间的id部分")
                     return@regex
                 } else {
-                    // 0: 连载中 1: 已完结 2: 不存在
                     when (superModel.status) {
                         0 -> {
                             if (SubscribeData.subscribe(
-                                    group.id, sid, superModel.superTitle,
+                                    group.id, sid, superModel.weiboTitle,
                                     BotDataBase.Platform.SUPER
                                 )
                             ) {
-                                SubSuperCache.refreshCache()
-                                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
+                                SubWeiboCache.refreshSuperCache()
+                                SubWeiboCache.setLastSuperUpdateTime(sid, System.currentTimeMillis())
                                 subject.sendMessage(
-                                    "${superModel.superTitle} : \n订阅成功"
+                                    "${superModel.weiboTitle} : \n订阅成功"
                                 )
                             } else {
                                 subject.sendMessage("你已经订阅过了: $sid")
@@ -93,66 +92,24 @@ fun Bot.subSuperIndex() {
                 return@regex
             } else {
                 val success = SubscribeData.unsubscribe(group.id, sid, BotDataBase.Platform.SUPER)
-                SubSuperCache.refreshCache()
+                SubWeiboCache.refreshSuperCache()
                 if (success) subject.sendMessage("取订成功: $sid") else subject.sendMessage("本群没有订阅该超话")
             }
         }
     }
 
-    suspend fun Bot.sendSuperUpdate(sId: String, groupId: List<Long>, model: SuperIndexModel) {
-        coroutineScope {
-            launch {
-                val client = KtorClient.getInstance()
-                client?.let {
-                    if (model.status == 0) {
-                        model.result.forEach { model ->
-                            if (model.time_unix > SubSuperCache.getLastUpdateTime(sId)) {
-                                groupId.forEach {
-                                    val contact = getGroupOrFail(it)
-                                    buildMessageChain {
-                                        add("${model.content}\n")
-                                        if (model.ttarticleLink.isNotEmpty()) {
-                                            add("头条文章：${model.ttarticleLink}\n")
-                                        }
-                                        if (model.imgUrls.isNotEmpty()) {
-                                            model.imgUrls.forEach {
-                                                val byteArray = client.get<ByteArray>(it)
-                                                add(byteArray.inputStream().uploadAsImage(contact))
-                                            }
-                                        }
-                                        if (model.extra.isNotEmpty()) {
-                                            model.extra.forEach { ext ->
-                                                if (!ext.contains("weibo.com/n/")
-                                                    && !ext.contains("weibo.com/p/")) {
-                                                    // 排除@和位置信息
-                                                    add("$ext\n")
-                                                }
-                                            }
-                                        }
-                                        add("by ${model.author} at ${model.time}\n")
-                                        add(model.link) // 原微博链接
-                                    }.sendTo(contact)
-                                }
-                            }
-                        }
-                    }
-                }
-                delay(2000)
-            }
-        }
-    }
     Timer().schedule(Date(), period = TimeUnit.MINUTES.toMillis(1)) {
-        val superItem = SubSuperCache.nextSub()
+        val superItem = SubWeiboCache.nextSubSuper()
         launch {
             val sid = superItem.key // nid
             val groupIdList = superItem.value
 
             val model = getSuperInfo(sid) ?: return@launch
-            if (SubSuperCache.getLastUpdateTime(sid) != 0L) {
-                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
-                sendSuperUpdate(sid, groupIdList, model)
+            if (SubWeiboCache.getLastSuperUpdateTime(sid) != 0L) {
+                sendWeiboUpdate(SUPER, sid, groupIdList, model)
+                SubWeiboCache.setLastSuperUpdateTime(sid, System.currentTimeMillis())
             } else{
-                SubSuperCache.setLastUpdateTime(sid, System.currentTimeMillis())
+                SubWeiboCache.setLastSuperUpdateTime(sid, System.currentTimeMillis())
             }
         }
     }

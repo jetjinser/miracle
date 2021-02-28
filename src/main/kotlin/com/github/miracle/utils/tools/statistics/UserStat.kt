@@ -37,7 +37,7 @@ object UserStatHandle {
         .limit(0, 1)
         .iterator().next()[User.favor]
 
-    val stat: UserStat?
+    val stat: UserStat
         get() = UserStat(
             getCount(),
             getMostDays(),
