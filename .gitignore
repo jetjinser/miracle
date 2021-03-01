@@ -9,3 +9,5 @@
 /src/main/resources/data.db
 /src/main/resources/button
 /MxLibData/
+/cache/servers.json
+/cache/session.bin

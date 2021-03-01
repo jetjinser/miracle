@@ -74,7 +74,7 @@ fun Bot.subSuperIndex() {
         }
 
         case("超话订阅列表") {
-            val list = SubscribeData.getPlatformSubList(group.id, BotDataBase.Platform.SUPER)
+            val list = SubscribeData.getPlatformSubList(group.id, SUPER)
             if (list == null) {
                 subject.sendMessage("本群还没有订阅超话")
             } else {

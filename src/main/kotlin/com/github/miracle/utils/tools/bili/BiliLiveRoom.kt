@@ -15,7 +15,9 @@ object BiliLiveRoom {
         val url = liveUrl + bid
         val client = KtorClient.getInstance() ?: return null
         return try {
-            client.get<BiliLiveModel>(url)
+            client.get<BiliLiveModel>(url) {
+                header("Connection", "close")
+            }
         } catch (e: SerializationException) {
             null
         }
@@ -26,7 +28,9 @@ object BiliLiveRoom {
         val client = KtorClient.getInstance() ?: return null
 
         return try {
-            client.get<BiliCheckModel>(url)
+            client.get<BiliCheckModel>(url) {
+                header("Connection", "close")
+            }
         } catch (e: SerializationException) {
             null
         }
