@@ -3,15 +3,18 @@ package com.github.miracle.utils.network.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * 超话和用户共用一套
+ */
 @Serializable
-data class SuperIndexModel(
+data class WeiboResponseModel(
     val status: Int,
-    @SerialName("super_title")
-    val superTitle: String,
-    val result: List<SuperIndex>
+    @SerialName("weibo_title")
+    val weiboTitle: String,
+    val result: List<WeiboModel>
 ) {
     @Serializable
-    data class SuperIndex(
+    data class WeiboModel(
         val title: String,
         val content: String,
         @SerialName("img_urls")

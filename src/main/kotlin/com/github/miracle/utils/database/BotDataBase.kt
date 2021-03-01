@@ -87,6 +87,7 @@ object BotDataBase {
         BILI(0),
         JJWXC(1),
         SUPER(2),
+        WEIBO(3),
     }
 
     object Flomo : Table<Nothing>("flomo") {
