@@ -90,6 +90,23 @@ object BotDataBase {
         WEIBO(3),
     }
 
+    // 抽奖
+    object Lottery : Table<Nothing>("Lottery") {
+        val id = int("id").primaryKey()
+        val groupId = long("group_id")
+        val sponsorId = long("sponsor_id")
+        val count = int("count")
+        val prize = varchar("prize")
+        val limit = int("limit")
+        val title = varchar("title")
+        val deadline = long("deadline")
+    }
+    // 参与抽奖
+    object JoinLottery : Table<Nothing>("JoinLottery") {
+        val lotId = int("lottery_id").primaryKey()
+        val qqId = long("qq_id").primaryKey()
+    }
+
     object Flomo : Table<Nothing>("flomo") {
         val qqId = long("qq_id").primaryKey()
         val flomoKey = varchar("flomo_key")

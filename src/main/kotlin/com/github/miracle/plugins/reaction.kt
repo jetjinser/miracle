@@ -9,7 +9,9 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
+import net.mamoe.mirai.event.events.FriendAddEvent
 import net.mamoe.mirai.event.events.MemberJoinEvent
+import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
@@ -45,5 +47,11 @@ fun Bot.reaction() {
                 "$groupName($groupId) 邀请入群, 已加入"
             )
         }
+    }
+    eventChannel.subscribeAlways<NewFriendRequestEvent> {
+        accept()
+        getFriendOrFail(owner).sendMessage(
+            "$fromId 添加好友"
+        )
     }
 }
