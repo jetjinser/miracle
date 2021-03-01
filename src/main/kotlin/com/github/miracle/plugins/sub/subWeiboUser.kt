@@ -136,7 +136,6 @@ suspend fun Bot.sendWeiboUpdate(
             else SubWeiboCache.getLastUserUpdateTime(objId)
             model.result.forEach { model ->
                 if (model.time_unix > lastTime) {
-                    println("send:$model")
                     groupId.forEach {
                         val contact = getGroupOrFail(it)
                         buildMessageChain {
