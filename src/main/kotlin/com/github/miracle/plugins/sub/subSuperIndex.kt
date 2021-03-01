@@ -4,24 +4,18 @@ import com.github.miracle.MiracleConstants
 import com.github.miracle.utils.data.SubWeiboCache
 import com.github.miracle.utils.data.SubscribeData
 import com.github.miracle.utils.database.BotDataBase
-import com.github.miracle.utils.database.BotDataBase.Platform.SUPER
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.SUPER
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.WeiboResponseModel
 import io.ktor.client.request.*
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.subscribeGroupMessages
-import net.mamoe.mirai.message.data.buildMessageChain
-import net.mamoe.mirai.message.data.sendTo
-import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
-private const val lizzieBar = 637538362L
 
 /**
  * 获取novel信息
@@ -37,6 +31,12 @@ suspend fun getSuperInfo(sid: String): WeiboResponseModel? {
 }
 
 fun Bot.subSuperIndex() {
+    val sIds = SubscribeData.getAllSubObject(BotDataBase.SubPlatform.SUPER)
+    sIds?.forEach {
+        it?.let {
+            SubWeiboCache.setLastSuperUpdateTime(it, System.currentTimeMillis())
+        }
+    }
     eventChannel.subscribeGroupMessages {
         Regex("""\s*超话订阅 +\w+\s*""") matching regex@{
             val sid = it.substringAfter("超话订阅").trim()
@@ -53,7 +53,7 @@ fun Bot.subSuperIndex() {
                         0 -> {
                             if (SubscribeData.subscribe(
                                     group.id, sid, superModel.weiboTitle,
-                                    BotDataBase.Platform.SUPER
+                                    SUPER
                                 )
                             ) {
                                 SubWeiboCache.refreshSuperCache()
@@ -91,7 +91,7 @@ fun Bot.subSuperIndex() {
             if (sid.isEmpty()) {
                 return@regex
             } else {
-                val success = SubscribeData.unsubscribe(group.id, sid, BotDataBase.Platform.SUPER)
+                val success = SubscribeData.unsubscribe(group.id, sid, BotDataBase.SubPlatform.SUPER)
                 SubWeiboCache.refreshSuperCache()
                 if (success) subject.sendMessage("取订成功: $sid") else subject.sendMessage("本群没有订阅该超话")
             }
@@ -106,7 +106,7 @@ fun Bot.subSuperIndex() {
 
             val model = getSuperInfo(sid) ?: return@launch
             if (SubWeiboCache.getLastSuperUpdateTime(sid) != 0L) {
-                sendWeiboUpdate(SUPER, sid, groupIdList, model)
+                sendWeiboUpdate(SUPER.value, sid, groupIdList, model)
                 SubWeiboCache.setLastSuperUpdateTime(sid, System.currentTimeMillis())
             } else{
                 SubWeiboCache.setLastSuperUpdateTime(sid, System.currentTimeMillis())

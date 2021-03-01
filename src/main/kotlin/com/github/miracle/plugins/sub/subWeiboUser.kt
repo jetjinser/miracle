@@ -4,8 +4,8 @@ import com.github.miracle.MiracleConstants
 import com.github.miracle.utils.data.SubWeiboCache
 import com.github.miracle.utils.data.SubscribeData
 import com.github.miracle.utils.database.BotDataBase
-import com.github.miracle.utils.database.BotDataBase.Platform.SUPER
-import com.github.miracle.utils.database.BotDataBase.Platform.WEIBO
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.SUPER
+import com.github.miracle.utils.database.BotDataBase.SubPlatform.WEIBO
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.WeiboResponseModel
 import io.ktor.client.request.*
@@ -37,6 +37,12 @@ suspend fun getUserWeibo(uid: String): WeiboResponseModel? {
 }
 
 fun Bot.subWeiboUser() {
+    val uIds = SubscribeData.getAllSubObject(WEIBO)
+    uIds?.forEach {
+        it?.let {
+            SubWeiboCache.setLastUserUpdateTime(it, System.currentTimeMillis())
+        }
+    }
     eventChannel.subscribeGroupMessages {
         Regex("""\s*微博订阅 +\w+\s*""") matching regex@{
             val uid = it.substringAfter("微博订阅").trim()
@@ -73,7 +79,7 @@ fun Bot.subWeiboUser() {
         }
 
         case("微博订阅列表") {
-            val list = SubscribeData.getPlatformSubList(group.id, BotDataBase.Platform.WEIBO)
+            val list = SubscribeData.getPlatformSubList(group.id, WEIBO)
             if (list == null) {
                 subject.sendMessage("本群还没有订阅微博用户")
             } else {
@@ -99,13 +105,13 @@ fun Bot.subWeiboUser() {
 
 
     Timer().schedule(Date(), period = TimeUnit.SECONDS.toMillis(30)) {
-        val superItem = SubWeiboCache.nextSubUser()
+        val userItem = SubWeiboCache.nextSubUser()
         launch {
-            val uid = superItem.key // nid
-            val groupIdList = superItem.value
+            val uid = userItem.key // nid
+            val groupIdList = userItem.value
             val model = getUserWeibo(uid) ?: return@launch
             if (SubWeiboCache.getLastUserUpdateTime(uid) != 0L) {
-                sendWeiboUpdate(WEIBO, uid, groupIdList, model)
+                sendWeiboUpdate(WEIBO.value, uid, groupIdList, model)
                 SubWeiboCache.setLastUserUpdateTime(uid, System.currentTimeMillis())
             } else {
                 SubWeiboCache.setLastUserUpdateTime(uid, System.currentTimeMillis())
@@ -126,10 +132,11 @@ suspend fun Bot.sendWeiboUpdate(
             if (model.status != 0) {
                 return@launch
             }
-            val lastTime = if (type == SUPER) SubWeiboCache.getLastSuperUpdateTime(objId)
+            val lastTime = if (type == SUPER.value) SubWeiboCache.getLastSuperUpdateTime(objId)
             else SubWeiboCache.getLastUserUpdateTime(objId)
             model.result.forEach { model ->
                 if (model.time_unix > lastTime) {
+                    println("send:$model")
                     groupId.forEach {
                         val contact = getGroupOrFail(it)
                         buildMessageChain {
@@ -138,8 +145,8 @@ suspend fun Bot.sendWeiboUpdate(
                                 add("头条文章：${model.ttarticleLink}\n")
                             }
                             if (model.imgUrls.isNotEmpty()) {
-                                model.imgUrls.forEach {
-                                    val byteArray = client.get<ByteArray>(it)
+                                model.imgUrls.forEach { img ->
+                                    val byteArray = client.get<ByteArray>(img)
                                     add(byteArray.inputStream().uploadAsImage(contact))
                                 }
                             }

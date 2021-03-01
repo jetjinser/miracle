@@ -16,32 +16,32 @@ suspend fun main() {
     }.alsoLogin()
 
     bot.apply {
+        // base
         builtInReply()
         random()
-        checkIn()
-        seTu()
         reaction()
         bili()
         subBili()
         button()
         antiLightApp()
-//        record()
         thesaurus()
-//        setting()
         music()
         information()
-        tuling()
         remind()
         scheduler()
         woPay()
         help()
         manage()
         translate()
-//        saveMsg()
-//        subJjwxc()
-//        subSuperIndex()
-//        flomo()
-//        shotSender()
+        // 五十弦
+        checkIn()
+        seTu()
+        tuling()
+        // 腹肌
+        saveMsg()
+        subJjwxc()
+        subSuperIndex()
+        subWeiboUser()
     }
     bot.join()
 }

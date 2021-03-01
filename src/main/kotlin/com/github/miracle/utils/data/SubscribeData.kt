@@ -120,4 +120,12 @@ object SubscribeData {
         }
         return if (result.isEmpty()) null else result
     }
+
+    fun getAllSubObject(platform: SubPlatform):List<String?>? {
+        val query = dataBase?.from(Subscription)?.select(Subscription.objectId)
+            ?.where {
+                (Subscription.platform eq platform.value)
+            }
+        return query?.map { it[Subscription.objectId] }?.toList()
+    }
 }

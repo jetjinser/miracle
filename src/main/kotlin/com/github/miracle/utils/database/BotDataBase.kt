@@ -82,11 +82,12 @@ object BotDataBase {
         val platform = int("platform")
         val title = varchar("title")
     }
-    object Platform {
-        const val BILI = 0
-        const val JJWXC = 1
-        const val SUPER = 2
-        const val WEIBO = 3
+
+    enum class SubPlatform(val value: Int) {
+        BILI(0),
+        JJWXC(1),
+        SUPER(2),
+        WEIBO(3),
     }
 
     object Flomo : Table<Nothing>("flomo") {
