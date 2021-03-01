@@ -38,7 +38,7 @@ fun Bot.woPay() {
 
     eventChannel.subscribeGroupMessages(priority = EventPriority.LOWEST) {
         contains("token", ignoreCase = true, trim = true) {
-            atBot {
+            if (message.firstIsInstanceOrNull<At>()?.target == bot.id) {
                 val content = message.first { it is PlainText }.content
                 var msg = content.substringAfter("token").trim()
                 if (msg.isEmpty()) {
@@ -49,7 +49,7 @@ fun Bot.woPay() {
                 if (success == null) {
                     subject.sendMessage("失败, token不存在")
                     intercept()
-                    return@atBot
+                    return@contains
                 }
                 subject.sendMessage("成功! 续期到 $success")
                 intercept()

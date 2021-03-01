@@ -132,10 +132,8 @@ fun Bot.lottery() {
     Timer().schedule(Date(), period = TimeUnit.MINUTES.toMillis(1)) {
         launch {
             lotteryList.forEach {
-                println(it)
                 if (it.element4 <= Date().time) { // ddl < now
                     // 开奖
-                    println("开奖 ${it.element1}: ${it.element4}")
                     val winMemberIdList = mutableListOf<Long>()
                     if (it.element3 == 0) {
                         // 在全群中抽取
@@ -172,7 +170,6 @@ fun Bot.lottery() {
                     buildMessageChain {
                         add("${LotteryData.getLotteryInfoById(it.element1)}开奖，获奖者为：\n")
                         winMemberIdList.forEach { id ->
-                            println("获奖 $id")
                             add(At(id))
                         }
                     }.sendTo(getGroupOrFail(it.element2))
