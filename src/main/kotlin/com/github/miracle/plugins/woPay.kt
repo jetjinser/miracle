@@ -23,7 +23,7 @@ fun Bot.woPay() {
         WoPayData.register(group.id, LocalDate.now().toString())
     }
 
-    Timer().schedule(timeStart(4).time) {
+    Timer().schedule(timeStart(4)) {
         for (group in this@woPay.groups) {
             val date = LocalDate.parse(WoPayData.inquire(group.id), DateTimeFormatter.ISO_DATE)
             if (date.isBefore(LocalDate.now())) {
