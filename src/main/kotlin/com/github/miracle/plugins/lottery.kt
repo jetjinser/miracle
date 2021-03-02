@@ -80,7 +80,7 @@ fun Bot.lottery() {
                 subject.sendMessage(
                     "抽奖设置完成！id为$result\n" +
                             "$deadline 开奖抽 ${count}个$prize\n" +
-                            "限制参与人数：${
+                            "限制最大参与人数：${
                                 if (limit == 0) "全群自动参与"
                                 else "$limit 人，请群员艾特机器人并发送抽奖id参与抽奖"
                             }"
