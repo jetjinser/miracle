@@ -23,10 +23,12 @@ fun Bot.help() {
                     // 直接发送 help
                     subject.sendMessage(
                         """我目前的功能有:
-                        |${pluginNameArray.joinToString("\n")}
+                        |${pluginNameArray.joinToString("/")}
                         |可发送 帮助 <功能名> 来查看详情
-                        |反馈可加群: 117340135
-                        |readme: 待填
+                        |问题反馈链接：https://support.qq.com/products/313165
+                        |使用指南：https://shimo.im/docs/rh8r9qkrWRPjx8Ty/
+//                        |讨论群：494839826
+                        |讨论群：117340135
                     """.trimMargin()
                     )
                     intercept()

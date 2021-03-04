@@ -58,7 +58,6 @@ fun Bot.saveMsg() {
                 recordName = ""
                 startRecord = false
                 tempMergeString = ""
-                getFriendOrFail(SecretConfig.owner).sendMessage("有车了")
             }
             return@case
         }
