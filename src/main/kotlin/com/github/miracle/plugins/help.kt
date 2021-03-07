@@ -27,9 +27,10 @@ fun Bot.help() {
                         |可发送 帮助 <功能名> 来查看详情
                         |问题反馈链接：https://support.qq.com/products/313165
                         |使用指南：https://shimo.im/docs/rh8r9qkrWRPjx8Ty/
-//                        |讨论群：494839826
-                        |讨论群：117340135
+                        |捐赠开发者：https://dun.mianbaoduo.com/@zhufree
+                        |讨论群：494839826（腹肌） / 117340135（五十弦）
                     """.trimMargin()
+//                        |讨论群：117340135
                     )
                     intercept()
                 } else {
