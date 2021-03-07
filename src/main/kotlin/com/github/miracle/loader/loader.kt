@@ -34,9 +34,9 @@ suspend fun main() {
         translate()
 //        woPay() 付费系统废弃
         // 五十弦
-        checkIn()
-        seTu()
-        tuling()
+//        checkIn()
+//        seTu()
+//        tuling()
         // 腹肌
         saveMsg()
         subJjwxc()
