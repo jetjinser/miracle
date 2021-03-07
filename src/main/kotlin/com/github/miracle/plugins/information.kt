@@ -11,7 +11,6 @@ import com.github.miracle.utils.network.model.ShiCiModel
 fun Bot.information() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*一言|(five|废物|二次元)语录\s*""") matching regex@{
-            subject.sendMessage("暂时坏了喔")
             val five = KtorClient.getInstance()?.get<String>("https://v1.hitokoto.cn/?encode=text")
             if (five != null) subject.sendMessage(five) else subject.sendMessage("获取失败")
         }

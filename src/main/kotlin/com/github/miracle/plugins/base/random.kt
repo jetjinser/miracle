@@ -13,6 +13,7 @@ fun Bot.random() {
                 message.content
                     .split(" ")
                     .filter { it.isNotEmpty() }
+                    .drop(1) // FIX removePrefix 不起作用
                     .shuffled().joinToString(" ")
             )
         }
@@ -26,7 +27,6 @@ fun Bot.random() {
                 message.content
                     .split(" ")
                     .filter { it.isNotEmpty() }
-                    .drop(1)
                     .random()
             )
         }
@@ -40,8 +40,14 @@ private fun randomNumber(message: String): String {
     val msg = message.split(" ").filter { it.isNotEmpty() }
 
     try {
-        start = msg[0].toInt()
-        end = msg[1].toInt()
+        // FIX remove prefix 不起作用
+        if (msg[0] == "随机数") {
+            start = msg[1].toInt()
+            end = msg[2].toInt()
+        } else {
+            start = msg[0].toInt()
+            end = msg[1].toInt()
+        }
     } catch (e: NumberFormatException) {
         return "需要是数字"
     } catch (e: IndexOutOfBoundsException) {

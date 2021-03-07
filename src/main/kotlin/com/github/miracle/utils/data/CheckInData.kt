@@ -1,5 +1,6 @@
 package com.github.miracle.utils.data
 
+import com.github.miracle.SecretConfig
 import me.liuwj.ktorm.database.Database
 import me.liuwj.ktorm.dsl.*
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -54,6 +55,7 @@ class CheckInData(private val event: GroupMessageEvent) {
      */
     suspend fun consumeCuprum(amount: Int, block: suspend (Pair<Boolean, Int?>) -> Boolean = { true }): Pair<Boolean, Int?> {
         val cuprum = cuprum
+        if (!SecretConfig.useCoin) return true to cuprum
         if (cuprum != null) {
             if (cuprum < amount) {
                 logger.info("${event.sender.nameCardOrNick} 当前铜币 $cuprum 枚, 不足消费 $amount")
