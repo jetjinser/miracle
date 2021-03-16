@@ -139,7 +139,7 @@ fun Bot.seTu() {
             }.sendTo(subject)
             // Exception in thread "main" java.lang.NoClassDefFoundError: com/sun/javaws/exceptions/MissingFieldException
         } catch (e: Exception) {
-            subject.sendMessage("不存在或暂不支持的返回, 后续逐步更新迭代将会解决")
+            subject.sendMessage("没有搜到呢")
         }
     }
 
@@ -192,7 +192,7 @@ fun Bot.seTu() {
     eventChannel.subscribeGroupMessages {
         Regex("""\s*[pP][识搜]图\s*""") matching {
             subject.sendMessage("请发送你要搜索的二次元图片")
-            val messageChain = nextMessage(timeoutMillis = 3000) {
+            val messageChain = nextMessage(timeoutMillis = 30000) {
                 message[Image] != null
             }
             messageChain[Image]?.queryUrl()?.let {
