@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.message.data.sendTo
@@ -34,13 +35,14 @@ suspend fun getLofterInfo(tid: String): LofterResponseModel? {
 
 fun Bot.subLofter() {
     val tIds = SubscribeData.getAllSubObject(BotDataBase.SubPlatform.LOFTER)
+    print(tIds);
     tIds?.forEach {
         it?.let {
             SubLofterCache.setLastTagUpdateTime(it, System.currentTimeMillis())
         }
     }
     eventChannel.subscribeGroupMessages {
-        Regex("""\s*lof订阅 +\w+\s*""") matching regex@{
+        Regex("""\s*lof订阅 .*""") matching regex@{
             println(it)
             val tid = it.substringAfter("lof订阅").trim()
             println(tid)
@@ -90,7 +92,7 @@ fun Bot.subLofter() {
             }
         }
 
-        Regex("""\s*lof取订 +\w+\s*""") matching regex@{
+        Regex("""\s*lof取订 .*""") matching regex@{
             val tName = it.substringAfter("lof取订").trim()
             if (tName.isEmpty()) {
                 return@regex
