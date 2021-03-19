@@ -27,6 +27,7 @@ fun Bot.random() {
                 message.content
                     .split(" ")
                     .filter { it.isNotEmpty() }
+                    .drop(1)
                     .random()
             )
         }

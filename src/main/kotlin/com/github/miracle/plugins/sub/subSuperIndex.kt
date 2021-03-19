@@ -18,7 +18,7 @@ import kotlin.concurrent.schedule
 
 
 /**
- * 获取novel信息
+ * 获取超话信息
  */
 suspend fun getSuperInfo(sid: String): WeiboResponseModel? {
     val client = KtorClient.getInstance() ?: return null
@@ -31,7 +31,7 @@ suspend fun getSuperInfo(sid: String): WeiboResponseModel? {
 }
 
 fun Bot.subSuperIndex() {
-    val sIds = SubscribeData.getAllSubObject(BotDataBase.SubPlatform.SUPER)
+    val sIds = SubscribeData.getAllSubObject(SUPER)
     sIds?.forEach {
         it?.let {
             SubWeiboCache.setLastSuperUpdateTime(it, System.currentTimeMillis())

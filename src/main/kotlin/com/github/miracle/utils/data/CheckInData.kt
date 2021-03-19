@@ -55,7 +55,10 @@ class CheckInData(private val event: GroupMessageEvent) {
      */
     suspend fun consumeCuprum(amount: Int, block: suspend (Pair<Boolean, Int?>) -> Boolean = { true }): Pair<Boolean, Int?> {
         val cuprum = cuprum
-        if (!SecretConfig.useCoin) return true to cuprum
+        if (!SecretConfig.useCoin) {
+            block(true to cuprum)
+            return true to cuprum
+        }
         if (cuprum != null) {
             if (cuprum < amount) {
                 logger.info("${event.sender.nameCardOrNick} 当前铜币 $cuprum 枚, 不足消费 $amount")
