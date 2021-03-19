@@ -1,7 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.4'
 }
-
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.21'
     id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.21"
@@ -22,6 +21,7 @@ repositories {
     mavenCentral()
     maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
     maven { url "https://dl.bintray.com/karlatemp/misc" }
+    maven { url 'https://jitpack.io' }
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
@@ -56,23 +56,6 @@ dependencies {
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
     compile files("libs/LowPoly-1.1.jar")
 
-    compile files("javaws.jar")
+    implementation 'com.rometools:rome:1.15.0'
+    implementation 'org.jsoup:jsoup:1.10.1'
 }
-//Copy类型
-task makeJar(type: Copy) {
-    //删除存在的
-    delete 'build/libs/qqbot.jar'
-    //设置拷贝的文件
-    from('build/intermediates/bundles/release/')
-    //打进jar包后的文件目录
-    into('build/libs/')
-    //将classes.jar放入build/libs/目录下
-    //include ,exclude参数来设置过滤
-    //（我们只关心classes.jar这个文件）
-    include('classes.jar')
-    //重命名
-    rename('classes.jar', 'qqbot.jar')
-}
-makeJar.dependsOn(build)
-//在终端执行生成JAR包
-// gradlew makeJar
