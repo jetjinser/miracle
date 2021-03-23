@@ -89,6 +89,7 @@ object BotDataBase {
         SUPER(2),
         WEIBO(3),
         LOFTER(4),
+        REDDIT(5),
     }
 
     // 抽奖

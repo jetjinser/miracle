@@ -155,7 +155,7 @@ suspend fun Bot.sendWeiboUpdate(
                                 }
                             }
                             add(model.link) // 原微博链接
-                            add("by ${model.author} at ${model.time}\n")
+                            add("\nby ${model.author} at ${model.time}\n")
                         }.sendTo(contact)
                     }
                 }
