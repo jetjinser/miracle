@@ -35,7 +35,6 @@ suspend fun getLofterInfo(tid: String): LofterResponseModel? {
 
 fun Bot.subLofter() {
     val tIds = SubscribeData.getAllSubObject(BotDataBase.SubPlatform.LOFTER)
-    print(tIds);
     tIds?.forEach {
         it?.let {
             SubLofterCache.setLastTagUpdateTime(it, System.currentTimeMillis())
@@ -43,9 +42,7 @@ fun Bot.subLofter() {
     }
     eventChannel.subscribeGroupMessages {
         Regex("""\s*lof订阅 .*""") matching regex@{
-            println(it)
             val tid = it.substringAfter("lof订阅").trim()
-            println(tid)
             if (tid.isEmpty()) {
                 return@regex
             } else {
