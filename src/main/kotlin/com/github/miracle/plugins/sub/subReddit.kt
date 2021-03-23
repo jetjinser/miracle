@@ -97,57 +97,68 @@ fun Bot.subReddit() {
             }
         }
     }
-    suspend fun sendRedditUpdate(groupId: List<Long>, model: SyndEntry) {
-        val doc = Jsoup.parse(model.contents[0].value)
-        val content = doc.text();
-        print(content);
-        val imgs = doc.select("img");
-        print(imgs);
+    suspend fun sendRedditUpdate(groupId: List<Long>, entry: SyndEntry) {
+        val client = KtorClient.getInstance() ?: return
+        val imgList = emptyList<String>().toMutableList()
+        // 单图
+        if (entry.foreignMarkup.size > 1){
+            val imgElm = entry.foreignMarkup[1]
+            imgList.add(imgElm.getAttribute("url").value)
+        }
+        val doc = Jsoup.parse(entry.contents[0].value)
+        val content = doc.text()
+        // 多图
+        val galleryLink = doc.select("a").filter { it.attr("href").contains("gallery") }
+        if (galleryLink.isNotEmpty()) {
+            val galleryUrl = galleryLink[0].attr("href")
+            val resp = client.get<String>(galleryUrl)
+            val galleryDoc = Jsoup.parse(resp)
+            val imgTags = galleryDoc.select("a[href*=preview.redd.it]")
+            imgTags.forEach {
+                imgList.add(it.absUrl("href"))
+            }
+        }
         launch {
-            val client = KtorClient.getInstance() ?: return@launch
             groupId.forEach {
                 val contact = getGroupOrFail(it)
-
                 buildMessageChain {
-                    add("${model.title}\n")
+                    add("${entry.title}\n")
                     add("${content}\n")
-                    if (imgs.size > 0) {
-                        imgs.forEachIndexed { index, img ->
+                    if (imgList.size > 0) {
+                        imgList.forEachIndexed { index, img ->
                             if (index < 5) {
-                                val byteArray = client.get<ByteArray>(img.absUrl("src"))
+                                val byteArray = client.get<ByteArray>(img)
                                 add(byteArray.inputStream().uploadAsImage(contact))
                             } else {
                                 add("[图片]")
                             }
                         }
                     }
-                    add("${model.link}\n")
-                    add("by ${model.authors[0].uri} at ${model.updatedDate}")
+                    add("\n${entry.link}\n")
+                    add("by ${entry.authors[0].uri} at ${entry.updatedDate}")
                 }.sendTo(contact)
                 delay(2000)
             }
         }
     }
 
-    Timer().schedule(Date(), period = TimeUnit.MINUTES.toMillis(5)) {
+    Timer().schedule(Date(), period = TimeUnit.SECONDS.toMillis(60)) {
         val rssItem = SubRedditCache.nextSubRedditRss()
-        print(rssItem)
         launch {
-            val rUrl = rssItem.key // nid
             val groupIdList = rssItem.value
-            val lastTime = SubRedditCache.getLastRedditRssUpdateTime(rUrl)
+            val lastTime = SubRedditCache.getLastRedditRssUpdateTime(rssItem.key)
             if (lastTime == 0L) {
-                SubRedditCache.setLastRedditRssUpdateTime(rUrl, System.currentTimeMillis())
+                SubRedditCache.setLastRedditRssUpdateTime(rssItem.key, System.currentTimeMillis())
                 return@launch
             }
-            val rssFeed = getRedditInfo(rUrl) ?: return@launch
+            val rssFeed = getRedditInfo(rssItem.key) ?: return@launch
             rssFeed.entries.forEach { entry ->
                 val timeUnix = entry.updatedDate.time
                 if (timeUnix > lastTime) {
                     sendRedditUpdate(groupIdList, entry)
                 }
             }
-            SubRedditCache.setLastRedditRssUpdateTime(rUrl, System.currentTimeMillis())
+            SubRedditCache.setLastRedditRssUpdateTime(rssItem.key, System.currentTimeMillis())
         }
     }
 }
