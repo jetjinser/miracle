@@ -34,6 +34,8 @@ data class SauceNaoModel(
     @Serializable
     data class Header(
         @SerialName("similarity")
-        val similarity: String
+        val similarity: String,
+        @SerialName("thumbnail")
+        val thumbnail: String
     )
 }

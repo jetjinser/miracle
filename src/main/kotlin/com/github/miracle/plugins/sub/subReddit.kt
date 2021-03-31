@@ -142,7 +142,7 @@ fun Bot.subReddit() {
         }
     }
 
-    Timer().schedule(Date(), period = TimeUnit.SECONDS.toMillis(60)) {
+    Timer().schedule(Date(), period = TimeUnit.MINUTES.toMillis(5)) {
         val rssItem = SubRedditCache.nextSubRedditRss()
         launch {
             val groupIdList = rssItem.value
@@ -153,6 +153,7 @@ fun Bot.subReddit() {
             }
             val rssFeed = getRedditInfo(rssItem.key) ?: return@launch
             rssFeed.entries.forEach { entry ->
+                // 不用+8
                 val timeUnix = entry.updatedDate.time
                 if (timeUnix > lastTime) {
                     sendRedditUpdate(groupIdList, entry)
