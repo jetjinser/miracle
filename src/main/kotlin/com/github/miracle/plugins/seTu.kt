@@ -20,6 +20,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.nextMessage
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import java.io.InputStream
@@ -67,10 +68,14 @@ fun Bot.seTu() {
                     val imageResponse = client.get<HttpResponse>(data.url)
 
                     if (imageResponse.status.value == 200) {
-                        QuoteReply(buildMessageChain {
-                            "title: ${data.title}\nauthor: ${data.author}\n" +
-                                    "tags: ${data.tags.joinToString(", ")}\nhttps://www.pixiv.net/artworks/${data.pid}"
-                        }).sendTo(subject)
+                        buildMessageChain {
+                            add(
+                                "title: ${data.title}\nauthor: ${data.author}\n" +
+                                        "tags: ${data.tags.joinToString(", ")}\nhttps://www.pixiv.net/artworks/${data.pid}"
+                            )
+                            add("\n")
+                            add(At(this@seTuEmission.sender))
+                        }.sendTo(subject)
                         imageResponse.receive<InputStream>().uploadAsImage(subject)
                             .sendTo(subject).recallIn(75000)
                         return@consumeCuprum true
