@@ -42,6 +42,8 @@ suspend fun main() {
         subJjwxc()
         subSuperIndex()
         subWeiboUser()
+        subLofter()
+        subReddit()
         lottery()
     }
     bot.join()

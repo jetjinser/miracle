@@ -2,10 +2,9 @@ package com.github.miracle.utils.network
 
 import com.github.miracle.utils.logger.BotLogger
 import io.ktor.client.*
-import io.ktor.client.features.cookies.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
-import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
 
@@ -19,6 +18,7 @@ object KtorClient {
                 if (singleton == null) {
                     logger.info("Ktor Client Instantiate")
                     singleton = HttpClient {
+                        install(HttpTimeout)
                         install(JsonFeature) {
                             serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
                                 ignoreUnknownKeys = true

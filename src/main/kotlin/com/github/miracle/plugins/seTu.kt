@@ -3,13 +3,13 @@ package com.github.miracle.plugins
 import com.github.miracle.SecretConfig.loliconSeTuApiKey
 import com.github.miracle.SecretConfig.sauceNaoApiKey
 import com.github.miracle.utils.data.CheckInData
-import com.github.miracle.utils.data.MessageCacheData.messageCache
 import com.github.miracle.utils.network.KtorClient
 import com.github.miracle.utils.network.model.LoliconSeTuModel
 import com.github.miracle.utils.network.model.SauceNaoModel
 import com.github.miracle.utils.network.model.TraceMoeInfoModel
 import com.github.miracle.utils.network.model.TraceMoeModel
 import io.ktor.client.call.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.network.sockets.*
@@ -108,12 +108,21 @@ fun Bot.seTu() {
         val client = KtorClient.getInstance() ?: return
 
         try {
-            val model = client.get<SauceNaoModel>(url)
+            val model = client.get<SauceNaoModel>(url) {
+                timeout {
+                    requestTimeoutMillis = 10000
+                    connectTimeoutMillis = 5000
+                }
+            }
 
             val result = model.results.first()
             val data = result.data
-            var catPixiv = "https://pixiv.cat/${result.data.pixivId}.jpg"
-
+            val pivixId = result.data.pixivId
+            var catPixiv = if (pivixId != -1) {
+                "https://pixiv.cat/${pivixId}.jpg"
+            } else {
+                result.header.thumbnail
+            }
             val headResponse = client.head<HttpResponse>(catPixiv)
             var ps = ""
             if (headResponse.status.value == 404) {

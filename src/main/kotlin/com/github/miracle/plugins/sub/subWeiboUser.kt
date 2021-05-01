@@ -154,8 +154,8 @@ suspend fun Bot.sendWeiboUpdate(
                                     add("$ext\n")
                                 }
                             }
-                            add("by ${model.author} at ${model.time}\n")
                             add(model.link) // 原微博链接
+                            add("\nby ${model.author} at ${model.time}\n")
                         }.sendTo(contact)
                     }
                 }
