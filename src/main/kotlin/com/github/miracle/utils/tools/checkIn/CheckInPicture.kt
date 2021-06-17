@@ -1,20 +1,24 @@
 package com.github.miracle.utils.tools.checkIn
 
 import com.zzhoujay.lowpoly.LowPoly
+import net.mamoe.mirai.contact.MemberPermission
 import sun.font.FontDesignMetrics
 import java.awt.*
+import java.awt.font.TextAttribute
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URL
+import java.text.AttributedString
 import javax.imageio.ImageIO
+
 
 /**
  * 生成签到图片
  * @author jinser
  */
-class CheckInPicture(private val url: String, private val checkInModel: CheckInModel) {
+class CheckInPicture(private val url: String, private val checkInfo: CheckInfo) {
     enum class BackgroundImageType {
         LoyPoly,
         Gaussian
@@ -26,6 +30,11 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
         val os = ByteArrayOutputStream()
         ImageIO.write(imgBuffer, "png", os)
         return os.toByteArray()
+    }
+
+    fun generateAsBuffer(backgroundImageType: BackgroundImageType): BufferedImage {
+        val image = ImageIO.read(URL(url))
+        return compound(image, backgroundImageType)
     }
 
     private fun scaleByPercentage(inputImage: BufferedImage): BufferedImage {
@@ -79,12 +88,23 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
 
         graphic = formatAvatarImage.createGraphics()
 
+        // 头像边框颜色
+        // 普通群员: Color.white
+        // 管理员: Color(107,216,161)
+        // 群主: Color(236,185,31)
+
+        val col = when (checkInfo.permission) {
+            MemberPermission.MEMBER -> Color.white
+            MemberPermission.ADMINISTRATOR -> Color(107, 216, 161)
+            MemberPermission.OWNER -> Color(236, 185, 31)
+        }
+
         val borderS = 3
         val s: Stroke = BasicStroke(5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
         graphic?.apply {
             setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             stroke = s
-            color = Color.WHITE
+            color = col
             drawOval(borderS, borderS, width - borderS * 2, width - borderS * 2)
             dispose()
         }
@@ -104,9 +124,10 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
 
     private fun writtenTablet(tablet: BufferedImage): BufferedImage {
         val width = tablet.width  // 540
-        val cFont = Font("Microsoft JhengHei", Font.BOLD, 24)
+        // 设定字体
+        val mainFont = Font("Microsoft JhengHei", Font.BOLD, 24)
+        val fallbackFont = Font("symbola", Font.BOLD, 24)
         tablet.createGraphics().apply {
-            font = cFont
             setRenderingHints(
                 mapOf(
                     RenderingHints.KEY_ANTIALIASING to RenderingHints.VALUE_ANTIALIAS_ON,
@@ -116,15 +137,19 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
             )
 
 
-            val textHeight = FontDesignMetrics.getMetrics(cFont).height - 5
-            val textArray = checkInModel.checkInfoArray
+            val textHeight = FontDesignMetrics.getMetrics(mainFont).height - 5
+            val textArray = checkInfo.checkInfoArray
 
             var temp = textHeight
             for (text in textArray.dropLast(1)) {
                 if (text != null) {
                     var textWidth = 0
-                    text.forEach { textWidth += FontDesignMetrics.getMetrics(cFont).charWidth(it) }
-                    drawString(text, (width - textWidth) / 2, temp)
+                    text.forEach { textWidth += FontDesignMetrics.getMetrics(mainFont).charWidth(it) }
+                    drawString(
+                        createFallbackString(text, mainFont, fallbackFont).iterator,
+                        (width - textWidth) / 2,
+                        temp
+                    )
                     temp += textHeight
                 }
             }
@@ -135,7 +160,7 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
             font = tipsFont
             if (tip != null) {
                 tip.forEach { tipWidth += FontDesignMetrics.getMetrics(tipsFont).charWidth(it) }
-                drawString(tip, (width - tipWidth) / 2, temp + 6)
+                drawString(createFallbackString(tip, tipsFont, fallbackFont).iterator, (width - tipWidth) / 2, temp + 6)
             }
         }
         return tablet
@@ -201,5 +226,25 @@ class CheckInPicture(private val url: String, private val checkInModel: CheckInM
             dispose()
         }
         return backgroundImage
+    }
+
+    private fun createFallbackString(text: String, mainFont: Font, fallbackFont: Font): AttributedString {
+        val result = AttributedString(text)
+        val textLength = text.length
+        result.addAttribute(TextAttribute.FONT, mainFont, 0, textLength)
+        var fallback = false
+        var fallbackBegin = 0
+        for (i in text.indices) {
+            val curFallback = !mainFont.canDisplay(text[i])
+            if (curFallback != fallback) {
+                fallback = curFallback
+                if (fallback) {
+                    fallbackBegin = i
+                } else {
+                    result.addAttribute(TextAttribute.FONT, fallbackFont, fallbackBegin, i)
+                }
+            }
+        }
+        return result
     }
 }
