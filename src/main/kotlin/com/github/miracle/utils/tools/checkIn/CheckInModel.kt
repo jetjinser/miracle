@@ -2,6 +2,7 @@ package com.github.miracle.utils.tools.checkIn
 
 import com.github.miracle.utils.data.CheckInData
 import com.github.miracle.utils.data.TipsData
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -11,14 +12,14 @@ import java.time.format.DateTimeFormatter
  * @param event bot 收到的群消息的事件, 用于构造 [checkInData]
  * @author jinser
  */
-class CheckInModel(private val event: GroupMessageEvent) {
+class CheckInModel(private val event: GroupMessageEvent) : CheckInfo {
     val checkInData: CheckInData = CheckInData(event)
 
     fun haveCheckIn(): Boolean {
         return LocalDate.parse(checkInData.lastCheckInDay, DateTimeFormatter.ISO_DATE) == LocalDate.now()
     }
 
-    val checkInfoArray
+    override val checkInfoArray
         get() = arrayOf(
             checkInData.card,
             "签 到 成 功",
@@ -26,6 +27,9 @@ class CheckInModel(private val event: GroupMessageEvent) {
             "签到天数 ${checkInData.checkInDays}       好感度 ${checkInData.favor}",
             TipsData.tip ?: "null"
         )
+
+    override val permission: MemberPermission
+        get() = event.permission
 
     /**
      * 签到函数
@@ -80,4 +84,9 @@ class CheckInModel(private val event: GroupMessageEvent) {
             else -> cuprum + (50..100).random()
         }
     }
+}
+
+interface CheckInfo {
+    val checkInfoArray: Array<String?>
+    val permission: MemberPermission
 }
